@@ -30,7 +30,7 @@
             "label": "Use packages from this VSTS feed",
             "defaultValue": "",
             "helpMarkDown": "Include the selected feed in the generated NuGet.config.",
-            "required": "false",
+            "required": "true",
             "properties": {
                 "EditableOptions": "True"
             }
@@ -41,12 +41,22 @@
             "label": "Package",
             "defaultValue": "",
             "helpMarkDown": "Select the package that you want to promote",
-            "required": "false",
-            "visibleRule": "selectOrConfig = select",
+            "required": "true",
             "properties": {
                 "EditableOptions": "True"
             }
-        },          
+        },      
+        {
+            "name": "version",
+            "type": "pickList",
+            "label": "Package",
+            "defaultValue": "",
+            "helpMarkDown": "Select the package that you want to promote",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },             
     {
       "defaultValue": "",
       "groupName": "general",
@@ -91,7 +101,7 @@
         "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
         },
         {
-        "target": "versions",
+        "target": "version",
         "endpointId": "tfs:feed",
         "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds/$(feed)/packages/$(package)/versions?api-version=2.0-preview",
         "resultSelector": "jsonpath:$.value[*]",
