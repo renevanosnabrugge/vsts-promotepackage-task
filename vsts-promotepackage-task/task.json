@@ -68,7 +68,6 @@
             "defaultValue": "",
             "helpMarkDown": "Select the package that you want to promote",
             "required": "true",
-            "visibleRule": "feed = ONVZ",
             "properties": {
                 "EditableOptions": "false"
             }
@@ -81,7 +80,6 @@
             "defaultValue": "",
             "helpMarkDown": "Select the package that you want to promote",
             "required": "true",
-            "visibleRule": "1 = 1",
             "properties": {
                 "EditableOptions": "false"
             }
