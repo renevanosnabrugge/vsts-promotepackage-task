@@ -68,7 +68,7 @@
             "defaultValue": "",
             "helpMarkDown": "Select the package that you want to promote",
             "required": "true",
-            "visibleRule": "1 = 1",
+            "visibleRule": "feed = ONVZ",
             "properties": {
                 "EditableOptions": "false"
             }
