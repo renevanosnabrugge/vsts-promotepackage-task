@@ -120,7 +120,7 @@
       },
       "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages/{{{definition}}}",
       "resultSelector": "jsonpath:$[*]",
-      "resultTemplate": "{ \"Value\" : \"{{{protocolType}}}\", \"DisplayValue\" : \"{{{protocolType}}}\" }"
+      "resultTemplate": "{ \"defaultValue\" : \"{{{protocolType}}}\" }"
     },
     {
       "target": "releaseView",
