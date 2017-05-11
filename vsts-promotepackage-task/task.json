@@ -67,7 +67,10 @@
       "label": "Feed Type",
       "defaultValue": "",
       "helpMarkDown": "Select the package that you want to promote",
-      "required": "false"
+      "required": "false",
+      "properties": {
+        "EditableOptions": "false"
+      }      
     },
     {
       "name": "releaseView",
