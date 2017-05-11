@@ -1,9 +1,11 @@
 [CmdletBinding()]
 param()
 
-$outputVarBuildResult = Get-VstsInput -Name outputVarBuildResult
-$tagsBuildChanged = Get-VstsInput -Name tagsBuildChanged
-$tagsBuildNotChanged =Get-VstsInput -Name tagsBuildNotChanged
+$feedName = Get-VstsInput -Name feed
+$packageId = Get-VstsInput -Name definition
+$packageVersion =Get-VstsInput -Name version
+$releaseView =Get-VstsInput -Name releaseView
+$feedType =Get-VstsInput -Name feedType
 
 $baseurl = $env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI 
 $baseprojecturl += $baseurl +  $env:SYSTEM_TEAMPROJECT + "/_apis"
@@ -49,37 +51,24 @@ function ValidatePatToken($token)
 
 function Set-PackageQuality
 {
-    [CmdletBinding()]
-    [OutputType([object])]
-    param
-    (
-        [string] $feedType="nuget",
-        [string] $feedName="",
-        [string] $packageId="",
-        [string] $packageVersion="",
-        [string] $packageQuality=""
-        
-    )
-
-    $token = New-VSTSAuthenticationToken
-    
+   
     #API URL is slightly different for npm vs. nuget...
     switch($feedType)
     {
-        "npm" { $releaseViewURL = "$basepackageurl/$feedName/npm/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
-        "nuget" { $releaseViewURL = "$basepackageurl/$feedName/nuget/packages/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
-        default { $releaseViewURL = "$basepackageurl/$feedName/nuget/packages/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
+        "npm" { $releaseViewURL = "$basepackageurl/$feedName/$feedType/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
+        "nuget" { $releaseViewURL = "$basepackageurl/$feedName/$feedType/packages/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
+        default { $releaseViewURL = "$basepackageurl/$feedName/$feedType/packages/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
     }
     
      $json = @{
         views = @{
             op = "add"
             path = "/views/-"
-            value = "$packageQuality"
+            value = "$releaseView"
         }
     }
 
-    $response = Invoke-RestMethod -Uri $releaseViewURL -Headers @{Authorization = $token}   -ContentType "application/json" -Method Patch -Body (ConvertTo-Json $json)
+    $response = Invoke-RestMethod -Uri $releaseViewURL -Headers $headers   -ContentType "application/json" -Method Patch -Body (ConvertTo-Json $json)
     return $response
 }
 
