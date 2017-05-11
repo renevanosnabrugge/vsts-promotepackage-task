@@ -89,7 +89,7 @@
         {
         "target": "packages",
         "endpointId": "tfs:feed",
-        "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds/$(feed)/packages?api-version=2.0-preview",
+        "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds/ONVZ/packages?api-version=2.0-preview",
         "resultSelector": "jsonpath:$.value[*]",
         "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
         },
@@ -103,7 +103,7 @@
         {
         "target": "version",
         "endpointId": "tfs:feed",
-        "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds/$(feed)/packages/$(package)/versions?api-version=2.0-preview",
+        "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds/ONVZ/packages/2c7ef238-7701-44aa-becb-9cb183bb6f1b/versions?api-version=2.0-preview",
         "resultSelector": "jsonpath:$.value[*]",
         "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{version}}}\" }"
         }        
