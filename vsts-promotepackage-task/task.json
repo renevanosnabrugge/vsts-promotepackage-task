@@ -119,7 +119,7 @@
         "definition": "$(definition)"
       },
       "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages/{{{definition}}}",
-      "resultSelector": "jsonpath:$",
+      "resultSelector": "jsonpath:$[*]",
       "resultTemplate": "{ \"Value\" : \"{{{protocolType}}}\", \"DisplayValue\" : \"{{{protocolType}}}\" }"
     },
     {
