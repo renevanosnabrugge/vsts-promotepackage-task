@@ -1,0 +1,10 @@
+    {
+      "target": "definition",
+      "endpointId": "tfs:feed",
+      "parameters": {
+        "feed": "$(feed)"
+      },
+      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages?includeUrls=false",
+      "resultSelector": "jsonpath:$.value[?(@.protocolType=='NuGet')]",
+      "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
+    },
