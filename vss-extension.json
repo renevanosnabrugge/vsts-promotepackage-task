@@ -19,7 +19,8 @@
   "tags": [
     "Extension",
     "Build",
-    "Check",
+    "Package Management",
+    "Release View",
     "Xpirit"
   ],
   "screenshots": [
@@ -83,8 +84,8 @@
   ],
   "badges": [
     {
-      "href": "https://osnabrugge.visualstudio.com/_apis/public/build/definitions/7af0156d-a27f-46d9-abe3-16565ac6b4c7/115/badge",
-      "uri": "https://osnabrugge.visualstudio.com/_apis/public/build/definitions/7af0156d-a27f-46d9-abe3-16565ac6b4c7/115/badge",
+      "href": "https://osnabrugge.visualstudio.com/_apis/public/build/definitions/7af0156d-a27f-46d9-abe3-16565ac6b4c7/118/badge",
+      "uri": "https://osnabrugge.visualstudio.com/_apis/public/build/definitions/7af0156d-a27f-46d9-abe3-16565ac6b4c7/118/badge",
       "description": "Build"
     }
   ],
