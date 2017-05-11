@@ -1,7 +1,7 @@
 {
-  "id": "e4e2625a-f2ba-4f03-a0d4-985103b3c746",
+  "id": "7ca5869f-a901-4012-a50d-d0f9d436ffec",
   "name": "rvo-vsts-promotepackage-task",
-  "friendlyName": "Check Build Changed",
+  "friendlyName": "#{PrivatePublicExtension}#Promote package to Release View",
   "description": "Promotes a package to a Release View in VSTS Package Management",
   "helpMarkDown": "Version: #{PrivatePublicExtension}##{Build.BuildNumber}#. [More Information](https://github.com/renevanosnabrugge/vsts-promotepackage-task/wiki)",
   "category": "Utility",
@@ -31,7 +31,6 @@
             "defaultValue": "",
             "helpMarkDown": "Include the selected feed in the generated NuGet.config.",
             "required": "false",
-            "visibleRule": "selectOrConfig = select",
             "properties": {
                 "EditableOptions": "True"
             }
