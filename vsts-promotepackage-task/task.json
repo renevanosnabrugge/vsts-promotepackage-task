@@ -119,8 +119,8 @@
         "definition": "$(definition)"
       },
       "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages/{{{definition}}}",
-      "resultSelector": "jsonpath:$[*]",
-      "resultTemplate": "{ \"defaultValue\" : \"{{{protocolType}}}\" }"
+      "resultSelector": "jsonpath:$",
+      "resultTemplate": "\"defaultValue\" : \"{{{protocolType}}}\""
     },
     {
       "target": "releaseView",
