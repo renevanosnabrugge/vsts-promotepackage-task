@@ -1,0 +1,103 @@
+{
+  "manifestVersion": 1,
+  "id": "rvo-vsts-promotepackage-task",
+  "name": "Promote package to Release View",
+  "version": "0.0.0",
+  "publisher": "rvo",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "scope": [
+    "vso.build"
+  ],
+  "description": "This task promotes a package to a Release View in VSTS Package Management",
+  "categories": [
+    "Build and release"
+  ],
+  "tags": [
+    "Extension",
+    "Build",
+    "Check",
+    "Xpirit"
+  ],
+  "screenshots": [
+    {
+      "path": "extension/Images/Screenshots/add-task.png"
+    },
+    {
+      "path": "extension/Images/Screenshots/task-config.png"
+    },
+    {
+      "path": "extension/Images/Screenshots/custom-condition.png"
+    }
+  ],
+  "content": {
+    "details": {
+      "path": "readme.md"
+    },
+    "license": {
+      "path": "license.txt"
+    }
+  },
+  "links": {
+    "home": {
+      "uri": "https://roadtoalm.com/"
+    },
+    "company": {
+      "uri": "https://xpirit.com/"
+    },    
+    "support": {
+      "uri": "https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues"
+    },
+    "issues": {
+      "uri": "https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/renevanosnabrugge/vsts-promotepackage-task"
+  },
+  "branding": {
+    "color": "rgb(34, 34, 72)",
+    "theme": "dark"
+  },
+  "icons": {
+    "default": "extension/images/extension-icon-small.png",
+    "large": "extension/images/extension-icon.png"
+  },
+  "files": [
+    {
+      "path": "vsts-promotepackage-task/ps_modules"
+    },
+    {
+      "path": "vsts-promotepackage-task/vsts-promotepackage-task.ps1"
+    },
+    {
+      "path": "vsts-promotepackage-task/icon.png"
+    },
+    {
+      "path": "vsts-promotepackage-task/task.json"
+    }
+  ],
+  "badges": [
+    {
+      "href": "https://osnabrugge.visualstudio.com/_apis/public/build/definitions/7af0156d-a27f-46d9-abe3-16565ac6b4c7/115/badge",
+      "uri": "https://osnabrugge.visualstudio.com/_apis/public/build/definitions/7af0156d-a27f-46d9-abe3-16565ac6b4c7/115/badge",
+      "description": "Build"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "vsts-promotepackage-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "vsts-promotepackage-task"
+      }
+    }
+  ]
+}

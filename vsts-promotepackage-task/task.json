@@ -1,0 +1,62 @@
+{
+  "id": "e4e2625a-f2ba-4f03-a0d4-985103b3c746",
+  "name": "rvo-vsts-promotepackage-task",
+  "friendlyName": "Check Build Changed",
+  "description": "Promotes a package to a Release View in VSTS Package Management",
+  "helpMarkDown": "Version: #{PrivatePublicExtension}##{Build.BuildNumber}#. [More Information](https://github.com/renevanosnabrugge/vsts-promotepackage-task/wiki)",
+  "category": "Utility",
+  "author": "Rene van Osnabrugge",
+  "version": {
+    "Major": 0,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "minimumAgentVersion": "1.83.0",
+  "groups": [
+    {
+      "name": "general",
+      "displayName": "General Settings",
+      "isExpanded": true
+    }
+  ],
+  "inputs": [
+    {
+      "defaultValue": "",
+      "groupName": "general",
+      "helpMarkdown": "Name of the output variabele that you want to set. Do not use $(outputVar) but only outputVar",
+      "label": "Output variable",
+      "name": "outputVarBuildResult",
+      "required": true,
+      "type": "string"
+    },
+    {
+      "defaultValue": "",
+      "groupName": "general",
+      "helpMarkdown": "Set a value to set a build tag when the build has changed. Use Tag1;Tag2 format for multiple tags.",
+      "label": "Build Tag(s) when build changed",
+      "name": "tagsBuildChanged",
+      "required": false,
+      "type": "string"
+    },
+    {
+      "defaultValue": "",
+      "groupName": "general",
+      "helpMarkdown": "Set a value to set a build tag when the build has NOT changed. Use Tag1;Tag2 format for multiple tags.",
+      "label": "Build Tag(s) when build did not change",
+      "name": "tagsBuildNotChanged",
+      "required": false,
+      "type": "string"
+    }
+  ],
+  "instanceNameFormat": "Promote package to Release View",
+  "execution": {
+    "PowerShell3": {
+      "target": "$(currentDirectory)\\vsts-promotepackage-task.ps1",
+      "argumentFormat": ""
+    }
+  }
+}
