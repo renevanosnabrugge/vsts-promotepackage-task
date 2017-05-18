@@ -13,7 +13,7 @@ In this task, you select the package feed from your account, the package, the ve
 Find the task in the Utility category of Build
 
 # Known issues
- * No support for other feedTypes then NuGet and NPM
+ * No support for other feedTypes then NuGet and npm
 
 # Documentation
 
