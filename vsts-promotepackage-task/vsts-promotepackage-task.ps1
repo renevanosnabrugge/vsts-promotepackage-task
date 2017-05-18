@@ -1,14 +1,14 @@
 [CmdletBinding()]
 param()
 
-$outputVarBuildResult = Get-VstsInput -Name outputVarBuildResult
-$tagsBuildChanged = Get-VstsInput -Name tagsBuildChanged
-$tagsBuildNotChanged =Get-VstsInput -Name tagsBuildNotChanged
+$feedName = Get-VstsInput -Name feed
+$packageId = Get-VstsInput -Name definition
+$packageVersion =Get-VstsInput -Name version
+$releaseView =Get-VstsInput -Name releaseView
 
-$baseurl = $env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI 
-$baseprojecturl += $baseurl +  $env:SYSTEM_TEAMPROJECT + "/_apis"
-$basefeedsurl = $baseurl -replace ".visualstudio", ".feeds.visualstudio"
-
+$account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
+$basepackageurl = ("https://{0}.pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
+$basefeedsurl = ("https://{0}.feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
 
 function InitializeRestHeaders()
 {
@@ -49,37 +49,31 @@ function ValidatePatToken($token)
 
 function Set-PackageQuality
 {
-    [CmdletBinding()]
-    [OutputType([object])]
-    param
-    (
-        [string] $feedType="nuget",
-        [string] $feedName="",
-        [string] $packageId="",
-        [string] $packageVersion="",
-        [string] $packageQuality=""
-        
-    )
+   # First get the name of the package (strange REST API behavior) and the Package Feed Type
+   $packageURL = "$basefeedsurl/$feedName/packages/$packageId/?api-version=2.0-preview"
+   $packResponse = Invoke-RestMethod -Uri $packageURL -Headers $headers -ContentType "application/json" -Method Get 
 
-    $token = New-VSTSAuthenticationToken
-    
+   $feedType = $packResponse.protocolType
+   $packageName = $packResponse.normalizedName
+
+
     #API URL is slightly different for npm vs. nuget...
     switch($feedType)
     {
-        "npm" { $releaseViewURL = "$basepackageurl/$feedName/npm/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
-        "nuget" { $releaseViewURL = "$basepackageurl/$feedName/nuget/packages/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
-        default { $releaseViewURL = "$basepackageurl/$feedName/nuget/packages/$packageId/versions/$($packageVersion)?api-version=3.0-preview.1" }
+        "npm" { $releaseViewURL = "$basepackageurl/$feedName/$feedType/$packageName/versions/$($packageVersion)?api-version=3.0-preview.1" }
+        "nuget" { $releaseViewURL = "$basepackageurl/$feedName/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=3.0-preview.1" }
+        default { $releaseViewURL = "$basepackageurl/$feedName/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=3.0-preview.1" }
     }
     
      $json = @{
         views = @{
             op = "add"
             path = "/views/-"
-            value = "$packageQuality"
+            value = "$releaseView"
         }
     }
-
-    $response = Invoke-RestMethod -Uri $releaseViewURL -Headers @{Authorization = $token}   -ContentType "application/json" -Method Patch -Body (ConvertTo-Json $json)
+Write-Host $releaseViewURL
+    $response = Invoke-RestMethod -Uri $releaseViewURL -Headers $headers   -ContentType "application/json" -Method Patch -Body (ConvertTo-Json $json)
     return $response
 }
 

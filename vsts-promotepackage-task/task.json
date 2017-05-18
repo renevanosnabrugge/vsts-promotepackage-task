@@ -1,7 +1,7 @@
 {
-  "id": "e4e2625a-f2ba-4f03-a0d4-985103b3c746",
+  "id": "7ca5869f-a901-4012-a50d-d0f9d436ffec",
   "name": "rvo-vsts-promotepackage-task",
-  "friendlyName": "Check Build Changed",
+  "friendlyName": "#{PrivatePublicExtension}#Promote package to Release View",
   "description": "Promotes a package to a Release View in VSTS Package Management",
   "helpMarkDown": "Version: #{PrivatePublicExtension}##{Build.BuildNumber}#. [More Information](https://github.com/renevanosnabrugge/vsts-promotepackage-task/wiki)",
   "category": "Utility",
@@ -24,82 +24,95 @@
     }
   ],
   "inputs": [
-        {
-            "name": "feed",
-            "type": "pickList",
-            "label": "Use packages from this VSTS feed",
-            "defaultValue": "",
-            "helpMarkDown": "Include the selected feed in the generated NuGet.config.",
-            "required": "false",
-            "visibleRule": "selectOrConfig = select",
-            "properties": {
-                "EditableOptions": "True"
-            }
-        },   
-        {
-            "name": "package",
-            "type": "pickList",
-            "label": "Package",
-            "defaultValue": "",
-            "helpMarkDown": "Select the package that you want to promote",
-            "required": "false",
-            "visibleRule": "selectOrConfig = select",
-            "properties": {
-                "EditableOptions": "True"
-            }
-        },          
     {
-      "defaultValue": "",
+      "name": "feed",
       "groupName": "general",
-      "helpMarkdown": "Name of the output variabele that you want to set. Do not use $(outputVar) but only outputVar",
-      "label": "Output variable",
-      "name": "outputVarBuildResult",
-      "required": true,
-      "type": "string"
+      "type": "pickList",
+      "label": "Use packages from this VSTS feed",
+      "defaultValue": "",
+      "helpMarkDown": "Include the selected feed in the generated NuGet.config.",
+      "required": "true",
+      "properties": {
+        "EditableOptions": "false"
+      }
     },
     {
-      "defaultValue": "",
+      "name": "definition",
       "groupName": "general",
-      "helpMarkdown": "Set a value to set a build tag when the build has changed. Use Tag1;Tag2 format for multiple tags.",
-      "label": "Build Tag(s) when build changed",
-      "name": "tagsBuildChanged",
-      "required": false,
-      "type": "string"
+      "type": "pickList",
+      "label": "Package",
+      "defaultValue": "",
+      "helpMarkDown": "Select the package that you want to promote",
+      "required": "true",
+      "properties": {
+        "EditableOptions": "false"
+      }
     },
     {
-      "defaultValue": "",
+      "name": "version",
       "groupName": "general",
-      "helpMarkdown": "Set a value to set a build tag when the build has NOT changed. Use Tag1;Tag2 format for multiple tags.",
-      "label": "Build Tag(s) when build did not change",
-      "name": "tagsBuildNotChanged",
-      "required": false,
-      "type": "string"
+      "type": "pickList",
+      "label": "Package Version",
+      "defaultValue": "",
+      "helpMarkDown": "Select the package that you want to promote",
+      "required": "true",
+      "properties": {
+        "EditableOptions": "false"
+      }
+    },
+    {
+      "name": "releaseView",
+      "groupName": "general",
+      "type": "pickList",
+      "label": "Release Views",
+      "defaultValue": "",
+      "helpMarkDown": "Select the package that you want to promote",
+      "required": "true",
+      "properties": {
+        "EditableOptions": "false"
+      }
     }
   ],
-    "dataSourceBindings": [
-        {
-        "target": "packages",
-        "endpointId": "tfs:feed",
-        "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds/$(feed)/packages?api-version=2.0-preview",
-        "resultSelector": "jsonpath:$.value[*]",
-        "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
-        },
-        {
-        "target": "feed",
-        "endpointId": "tfs:feed",
-        "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds",
-        "resultSelector": "jsonpath:$.value[*]",
-        "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
-        },
-        {
-        "target": "versions",
-        "endpointId": "tfs:feed",
-        "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds/$(feed)/packages/$(package)/versions?api-version=2.0-preview",
-        "resultSelector": "jsonpath:$.value[*]",
-        "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{version}}}\" }"
-        }        
-  ],  
-  
+  "dataSourceBindings": [
+    {
+      "target": "feed",
+      "endpointId": "tfs:feed",
+      "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds",
+      "resultSelector": "jsonpath:$.value[*]",
+      "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
+    },
+    {
+      "target": "definition",
+      "endpointId": "tfs:feed",
+      "parameters": {
+        "feed": "$(feed)"
+      },
+      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages?includeUrls=false",
+      "resultSelector": "jsonpath:$.value[?(@.protocolType=='NuGet')]",
+      "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
+    },
+    {
+      "target": "version",
+      "endpointId": "tfs:feed",
+      "parameters": {
+        "feed": "$(feed)",
+        "definition": "$(definition)"
+      },
+      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages/{{{definition}}}/Versions?includeUrls=false",
+      "resultSelector": "jsonpath:$.value[*]",
+      "resultTemplate": "{ \"Value\" : \"{{{version}}}\", \"DisplayValue\" : \"{{{version}}}\" }"
+    },
+    {
+      "target": "releaseView",
+      "endpointId": "tfs:feed",
+      "parameters": {
+        "feed": "$(feed)"
+      },
+      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/views",
+      "resultSelector": "jsonpath:$.value[*]",
+      "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
+    }
+  ],
   "instanceNameFormat": "Promote package to Release View",
   "execution": {
     "PowerShell3": {
