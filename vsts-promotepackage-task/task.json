@@ -4,7 +4,7 @@
   "friendlyName": "#{PrivatePublicExtension}#Promote package to Release View",
   "description": "Promotes a package to a Release View in VSTS Package Management",
   "helpMarkDown": "Version: #{PrivatePublicExtension}##{Build.BuildNumber}#. [More Information](https://github.com/renevanosnabrugge/vsts-promotepackage-task/wiki)",
-  "category": "Utility",
+  "category": "Package",
   "author": "Rene van Osnabrugge",
   "version": {
     "Major": 0,
@@ -33,7 +33,7 @@
       "helpMarkDown": "Include the selected feed in the generated NuGet.config.",
       "required": "true",
       "properties": {
-        "EditableOptions": "false"
+        "EditableOptions": "true"
       }
     },
     {
@@ -45,7 +45,7 @@
       "helpMarkDown": "Select the package that you want to promote",
       "required": "true",
       "properties": {
-        "EditableOptions": "false"
+        "EditableOptions": "true"
       }
     },
     {
@@ -57,7 +57,7 @@
       "helpMarkDown": "Select the package that you want to promote",
       "required": "true",
       "properties": {
-        "EditableOptions": "false"
+        "EditableOptions": "true"
       }
     },
     {
@@ -88,7 +88,7 @@
         "feed": "$(feed)"
       },
       "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages?includeUrls=false",
-      "resultSelector": "jsonpath:$.value[?(@.protocolType=='NuGet')]",
+      "resultSelector": "jsonpath:$.value[*]",
       "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
     },
     {
