@@ -6,10 +6,17 @@ $packageId = Get-VstsInput -Name definition
 $packageVersion =Get-VstsInput -Name version
 $releaseView =Get-VstsInput -Name releaseView
 
-$account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
-$basepackageurl = ("https://{0}.pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
-$basefeedsurl = ("https://{0}.feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
-
+if ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -like '*visualstudio*') {
+    Write-Verbose "VSTS MODE"
+    $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
+    $basepackageurl = ("https://{0}.pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
+    $basefeedsurl = ("https://{0}.feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
+}
+else {
+    write-Verbose "ONPREM MODE"
+    $basepackageurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "_apis/packaging/feeds";
+    $basefeedsurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "_apis/packaging/feeds";
+}
 function InitializeRestHeaders()
 {
 	$restHeaders = New-Object -TypeName "System.Collections.Generic.Dictionary[[String], [String]]"
