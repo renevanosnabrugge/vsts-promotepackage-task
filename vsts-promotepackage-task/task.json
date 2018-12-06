@@ -33,7 +33,7 @@
       "helpMarkDown": "Include the selected feed in the generated NuGet.config.",
       "required": "true",
       "properties": {
-        "EditableOptions": "true"
+        "EditableOptions": "false"
       }
     },
     {
@@ -45,7 +45,7 @@
       "helpMarkDown": "Select the package that you want to promote",
       "required": "true",
       "properties": {
-        "EditableOptions": "true"
+        "EditableOptions": "false"
       }
     },
     {
@@ -57,7 +57,7 @@
       "helpMarkDown": "Select the package that you want to promote",
       "required": "true",
       "properties": {
-        "EditableOptions": "true"
+        "EditableOptions": "false"
       }
     },
     {
