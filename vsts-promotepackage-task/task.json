@@ -54,10 +54,10 @@
       "type": "pickList",
       "label": "Package Version",
       "defaultValue": "",
-      "helpMarkDown": "Select the package that you want to promote",
+      "helpMarkDown": "Select the version you want to promote or enter a variable",
       "required": "true",
       "properties": {
-        "EditableOptions": "false"
+        "EditableOptions": "true"
       }
     },
     {
@@ -66,7 +66,7 @@
       "type": "pickList",
       "label": "Release Views",
       "defaultValue": "",
-      "helpMarkDown": "Select the package that you want to promote",
+      "helpMarkDown": "Select the view to which to promote the package",
       "required": "true",
       "properties": {
         "EditableOptions": "false"
