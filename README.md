@@ -1,5 +1,8 @@
 # Release Notes
 
+> **02-01-2019**
+> - Fixed an issue with editable package version (thanks dhuessmann)
+
 > **18-05-2017**
 > - Added: Initial preview release
 
