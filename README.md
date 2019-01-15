@@ -1,7 +1,7 @@
 # Release Notes
 
 > **10-01-2019**
-> - The feed, package and view to promote can now be specified via variables
+> - The feed, package and view to promote can now be specified via variables (thanks dhuessmann)
 
 > **02-01-2019**
 > - Fixed an issue with editable package version (thanks dhuessmann)
