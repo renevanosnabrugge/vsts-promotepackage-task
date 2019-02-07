@@ -12,7 +12,7 @@
   "scope": [
     "vso.build"
   ],
-  "description": "This task promotes a package to a Release View in VSTS Package Management",
+  "description": "This task promotes a package to a Release View in Azure DevOps Artifacts",
   "categories": [
     "Build and release"
   ],

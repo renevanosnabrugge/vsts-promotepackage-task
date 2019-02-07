@@ -1,14 +1,8 @@
 [CmdletBinding()]
-param()
+param(
+    [boolean]$localRun=$false
+)
 
-$feedName = Get-VstsInput -Name feed
-$packageId = Get-VstsInput -Name definition
-$packageVersion = Get-VstsInput -Name version
-$releaseView =Get-VstsInput -Name releaseView
-
-$account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
-$basepackageurl = ("https://{0}.pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
-$basefeedsurl = ("https://{0}.feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
 
 function InitializeRestHeaders()
 {
@@ -22,9 +16,15 @@ function InitializeRestHeaders()
 	}
 	else
 	{
-		$Username = $connectedServiceDetails.Authorization.Parameters.Username
-		Write-Verbose "Username = $Username" -Verbose
-		$Password = $connectedServiceDetails.Authorization.Parameters.Password
+        Write-Verbose "Username = $Username" -Verbose
+        if ($localRun -eq $true) {
+            $Username = ""
+            $Password = $env:pat
+        }
+        else {
+		    $Username = $connectedServiceDetails.Authorization.Parameters.Username
+            $Password = $connectedServiceDetails.Authorization.Parameters.Password
+        }
 		$alternateCreds = [String]::Concat($Username, ":", $Password)
 		$basicAuth = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($alternateCreds))
 		$restHeaders.Add("Authorization", [String]::Concat("Basic ", $basicAuth))
@@ -168,9 +168,11 @@ function Set-PackageQuality
     #API URL is slightly different for npm vs. nuget...
     switch($feedType)
     {
-        "npm" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/$packageName/versions/$($packageVersion)?api-version=3.0-preview.1" }
-        "nuget" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=3.0-preview.1" }
-        default { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=3.0-preview.1" }
+        "npm" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/$packageName/versions/$($packageVersion)??api-version=5.0-preview.1" }
+        "nuget" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "upack" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "pypi" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        default { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
     }
 
      $json = @{
@@ -185,5 +187,38 @@ function Set-PackageQuality
     return $response
 }
 
-$headers=InitializeRestHeaders
-Set-PackageQuality
+function Run() {
+
+$url = $env:SYSTEM_TEAMFOUNDATIONSERVERURI 
+$url = $url.ToLower()
+
+
+if ($url  -like "*dev.azure.com*") {
+    #new style
+    $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://dev.azure.com/(.*)\/", '$1').split('.')[0]
+    $basepackageurl = ("https://pkgs.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
+    $basefeedsurl = ("https://feeds.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
+}
+elseif ($url -like "*visualstudio.com*")
+{
+    #old style
+    $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
+    $basepackageurl = ("https://{0}.pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
+    $basefeedsurl = ("https://{0}.feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
+}
+else {
+    Write-Host "On-Premise TFS / Azure DevOps Server not supported"
+}
+
+    $headers=InitializeRestHeaders
+    Set-PackageQuality
+}
+
+if ($localRun -eq $false)
+{   
+    $feedName = Get-VstsInput -Name feed
+    $packageId = Get-VstsInput -Name definition
+    $packageVersion = Get-VstsInput -Name version
+    $releaseView =Get-VstsInput -Name releaseView
+    Run
+}

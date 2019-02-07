@@ -1,5 +1,11 @@
 # Release Notes
 
+> **07-02-2019**
+> - Accounts natively created in Azure DevOps (dev.azure.com) threw an error when promoting the package ([fix issue #16](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/16))
+> - Fixed Urls ([fix issue #6](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/16),[#9](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/9), [#3](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/3))
+> - Added Support for Pyhton, Maven and Universal Packages
+> - Added a Local Test Runner to test easily 
+
 > **10-01-2019**
 > - The feed, package and view to promote can now be specified via variables (thanks dhuessmann)
 
