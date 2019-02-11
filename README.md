@@ -2,6 +2,9 @@
 
 [![Build status](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_apis/build/status/vsts-promotepackage-task/vsts-promotepackage-task)](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_build/latest?definitionId=118)
 
+> **11-02-2019**
+> - Bug in running the task in Release Management due to url 
+
 > **07-02-2019**
 > - Accounts natively created in Azure DevOps (dev.azure.com) threw an error when promoting the package ([fix issue #16](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/16))
 > - Fixed Urls ([fix issue #6](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/16),[#9](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/9), [#3](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/3))
@@ -19,6 +22,7 @@
 
 # Description
 
+**BEWARE: This task does not work for on-prem TFS / Azure DevOps Server**
 This task enables you to promote a package in VSTS Package Management to a specific Release View. You can use Release Views to communicate Package Quality as [described here](https://www.visualstudio.com/en-us/docs/package/feeds/views). 
 In this task, you select the package feed from your account, the package, the version and the Release View to which you want to promote your package. 
 
