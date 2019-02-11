@@ -2,6 +2,10 @@
 
 [![Build status](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_apis/build/status/vsts-promotepackage-task/vsts-promotepackage-task)](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_build/latest?definitionId=118)
 
+
+> **11-02-2019**
+> - Bug in running the task in Release Management due to url 
+
 > **07-02-2019**
 > - Accounts natively created in Azure DevOps (dev.azure.com) threw an error when promoting the package ([fix issue #16](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/16))
 > - Fixed Urls ([fix issue #6](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/16),[#9](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/9), [#3](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/3))
