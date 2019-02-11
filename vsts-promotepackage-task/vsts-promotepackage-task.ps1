@@ -193,11 +193,18 @@ $url = $env:SYSTEM_TEAMFOUNDATIONSERVERURI
 $url = $url.ToLower()
 
 
-if ($url  -like "*dev.azure.com*") {
+if ($url  -like "https://vsrm.dev.azure.com*") {
     #new style
-    $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://dev.azure.com/(.*)\/", '$1').split('.')[0]
+    $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://vsrm.dev.azure.com/(.*)\/", '$1').split('.')[0]
     $basepackageurl = ("https://pkgs.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
     $basefeedsurl = ("https://feeds.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
+}
+elseif ($url -like "https://dev.azure.com*")
+{
+        #new style
+        $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://dev.azure.com/(.*)\/", '$1').split('.')[0]
+        $basepackageurl = ("https://pkgs.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
+        $basefeedsurl = ("https://feeds.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
 }
 elseif ($url -like "*visualstudio.com*")
 {
