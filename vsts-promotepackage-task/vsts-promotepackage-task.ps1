@@ -168,7 +168,7 @@ function Set-PackageQuality
     #API URL is slightly different for npm vs. nuget...
     switch($feedType)
     {
-        "npm" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/$packageName/versions/$($packageVersion)??api-version=5.0-preview.1" }
+        "npm" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
         "nuget" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
         "upack" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
         "pypi" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
