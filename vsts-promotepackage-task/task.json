@@ -37,6 +37,14 @@
       }
     },
     {
+      "name": "packageSourceThisFeed",
+      "type": "boolean",
+      "label": "Only packages from this Feed",
+      "defaultValue": "true",
+      "helpMarkDown": "Include only packages that are directly published to this feed, ignoring upstreams.",
+      "required": "false"
+    },
+    {
       "name": "definition",
       "groupName": "general",
       "type": "pickList",
@@ -87,7 +95,7 @@
       "parameters": {
         "feed": "$(feed)"
       },
-      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages?includeUrls=false",
+      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages?includeUrls=false{{#if packageSourceThisFeed}}&directUpstreamId=00000000-0000-0000-0000-000000000000{{/if}}",
       "resultSelector": "jsonpath:$.value[*]",
       "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
     },
