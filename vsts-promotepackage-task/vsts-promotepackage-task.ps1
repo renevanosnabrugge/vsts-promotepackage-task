@@ -99,7 +99,7 @@ function Get-PackageInfo($FeedId)
 {
     $name = "";
     $protocolType = "";
-    $id = ""
+    #$ret = ""
     $isId = $true
     try
     {
@@ -108,7 +108,7 @@ function Get-PackageInfo($FeedId)
         $packageResponse = Invoke-RestMethod -Uri $packageUrl -Headers $headers -ContentType "application/json" -Method Get
         $name = $packageResponse.normalizedName
         $protocolType = $packageResponse.protocolType
-        $id = $packageResponse.id
+        #$ret = $packageResponse.id
     }
     catch [System.Net.WebException]
     {
@@ -135,7 +135,6 @@ function Get-PackageInfo($FeedId)
                 {
                     $name = $package.normalizedName
                     $protocolType = $package.protocolType
-                    $id = $package.id
                 }
             }
         }
@@ -152,58 +151,7 @@ function Get-PackageInfo($FeedId)
         throw "Package $packageId could not be found"
     }
 
-    return $id, $name, $protocolType
-}
-
-function Get-NormalizedVersion($FeedId, $FeedType, $Id, $PackageVersion)
-{
-    Write-Verbose "Trying to get package versions"
-
-    #API URL is slightly different for npm vs. nuget...
-    switch($FeedType)
-    {
-        "npm" { $versionsUrl = "$basefeedsurl/$FeedId/$FeedType/$Id/versions?api-version=5.0-preview.1" }
-        "nuget" { $versionsUrl = "$basefeedsurl/$FeedId/packages/$Id/versions?api-version=5.0-preview.1" }
-        "upack" { $versionsUrl = "$basefeedsurl/$feedId/$FeedType/packages/$Id/versions?api-version=5.0-preview.1" }
-        "pypi" { $versionsUrl = "$basefeedsurl/$FeedId/$FeedType/packages/$Id/versions?api-version=5.0-preview.1" }
-        default { $versionsUrl = "$basefeedsurl/$FeedId/$FeedType/packages/$Id/versions?api-version=5.0-preview.1" }
-    }
-
-    try
-    {
-        $packageVersionsResponse = Invoke-RestMethod -Uri $versionsUrl -Headers $headers -ContentType "application/json" -Method Get
-
-        $packageVersions = $packageVersionsResponse.value
-
-        # Check version attribute first
-        foreach ($version in $packageVersions)
-        {
-            if ($version.version -eq $PackageVersion)
-            {
-                Write-Verbose -Verbose "Found a suitable Version (Version field): $($version.version)"
-                return $version.normalizedVersion
-            }
-        }
-
-        # Fall back to normalizedVersion attribute
-        foreach ($version in $packageVersions)
-        {
-            if ($version.normalizedVersion -eq $PackageVersion)
-            {
-                Write-Verbose -Verbose "Found a suitable Version (normalizedVersion field): $($version.normalizedVersion)"
-                return $version.normalizedVersion
-            }
-        }
-    }
-    catch
-    {
-        Write-Verbose -Verbose "Failed to retrieve package version information"
-        Write-Error $_
-        throw "Unhandled exception while reading package version $PackageName"
-    }
-
-    Write-Verbose -Verbose "Package Version $PackageVersion not found for Package $PackageName"
-    throw "Package Version $PackageVersion not found for Package $PackageName"
+    return $name, $protocolType
 }
 
 function Set-PackageQuality
@@ -214,29 +162,26 @@ function Set-PackageQuality
     $feedId = Get-FeedId
     $viewId = Get-ViewId -FeedId $feedId
     $packageInfo = Get-PackageInfo -FeedId $feedId
-    $id = $packageInfo[0]
-    $packageName = $packageInfo[1]
-    $feedType = $packageInfo[2]
-    $normalizedVersion = Get-NormalizedVersion -FeedId $feedId -FeedType $feedType -Id $id -PackageVersion $packageVersion
+    $packageName = $packageInfo[0]
+    $feedType = $packageInfo[1]
 
     #API URL is slightly different for npm vs. nuget...
     switch($feedType)
     {
-        "npm" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/$packageName/versions/$($normalizedVersion)?api-version=5.0-preview.1" }
-        "nuget" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($normalizedVersion)?api-version=5.0-preview.1" }
-        "upack" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($normalizedVersion)?api-version=5.0-preview.1" }
-        "pypi" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($normalizedVersion)?api-version=5.0-preview.1" }
-        default { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($normalizedVersion)?api-version=5.0-preview.1" }
+        "npm" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "nuget" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "upack" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "pypi" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        default { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
     }
 
-    $json = @{
+     $json = @{
         views = @{
             op = "add"
             path = "/views/-"
             value = "$viewId"
         }
     }
-
     Write-Host $releaseViewURL
     $response = Invoke-RestMethod -Uri $releaseViewURL -Headers $headers -ContentType "application/json" -Method Patch -Body (ConvertTo-Json $json)
     return $response

@@ -37,15 +37,6 @@
       }
     },
     {
-      "name": "packageSourceThisFeed",
-      "groupName": "general",
-      "type": "boolean",
-      "label": "Only packages from this Feed",
-      "defaultValue": "true",
-      "helpMarkDown": "Include only packages that are directly published to this feed, ignoring upstreams.",
-      "required": "true"
-    },
-    {
       "name": "definition",
       "groupName": "general",
       "type": "pickList",
@@ -94,10 +85,9 @@
       "target": "definition",
       "endpointId": "tfs:feed",
       "parameters": {
-        "feed": "$(feed)",
-        "packageSourceThisFeed": "$(packageSourceThisFeed)"
+        "feed": "$(feed)"
       },
-      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages?includeUrls=false{{#equals packageSourceThisFeed 'true'}}&directUpstreamId=00000000-0000-0000-0000-000000000000{{/equals}}",
+      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages?includeUrls=false",
       "resultSelector": "jsonpath:$.value[*]",
       "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
     },
