@@ -3,7 +3,7 @@
 [![Build status](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_apis/build/status/vsts-promotepackage-task/vsts-promotepackage-task)](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_build/latest?definitionId=118)
 
 > **11-06-2019**
-> - Reverted to older version because of Bug. published changes in new version 2.0. Does not work with Universal Packages
+> - Reverted to older version because of Bug. 
 
 > **28-05-2019**
 > - Added ability to select only packages in local feed ([fix issue #19](https://github.com/renevanosnabrugge/vsts-promotepackage-task/issues/19))
