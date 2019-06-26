@@ -16,17 +16,9 @@
     "Release"
   ],
   "minimumAgentVersion": "1.83.0",
-  "groups": [
-    {
-      "name": "general",
-      "displayName": "General Settings",
-      "isExpanded": true
-    }
-  ],
   "inputs": [
     {
       "name": "feed",
-      "groupName": "general",
       "type": "pickList",
       "label": "Use packages from this VSTS feed",
       "defaultValue": "",
@@ -38,7 +30,6 @@
     },
     {
       "name": "inputType",
-      "groupName": "general",
       "type": "radio",
       "label": "Package input type",
       "defaultValue": "nameVersion",
@@ -54,7 +45,6 @@
       "aliases": [
         "definition"
       ],
-      "groupName": "general",
       "type": "pickList",
       "label": "Package",
       "defaultValue": "",
@@ -67,7 +57,6 @@
     },
     {
       "name": "version",
-      "groupName": "general",
       "type": "pickList",
       "label": "Package Version",
       "defaultValue": "",
@@ -80,7 +69,6 @@
     },
     {
       "name": "packagesDirectory",
-      "groupName": "general",
       "type": "filePath",
       "label": "Package source folder",
       "defaultValue": "$(System.DefaultWorkingDirectory)",
@@ -90,7 +78,6 @@
     },
     {
       "name": "packagesPatternParse",
-      "groupName": "general",
       "type": "multiLine",
       "label": "Package contents",
       "defaultValue": "**/*.nupkg\n!**/*.symbols.nupkg\n**/*.tgz",
@@ -105,7 +92,6 @@
     },
     {
       "name": "releaseView",
-      "groupName": "general",
       "type": "pickList",
       "label": "Release Views",
       "defaultValue": "",
