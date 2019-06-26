@@ -186,7 +186,7 @@ function Set-PackageQuality
     return $response
 }
 
-function Run() {
+function Initalize-Request() {
 
     $url = $env:SYSTEM_TEAMFOUNDATIONSERVERURI
     $url = $url.ToLower()
@@ -217,14 +217,28 @@ function Run() {
     }
 
     $headers=InitializeRestHeaders
-    Set-PackageQuality
+}
+
+function Run() {
+    Initalize-Request
+
+    $ids = $packageIds -Split ';'
+    if ($ids.Length -gt 1) {
+        Write-Host "Promoting multiple packages named '$packageIds' with version '$packageVersion'"
+    } else {
+        Write-Host "Promoting single package named '$packageIds' with version '$packageVersion'"
+    }
+    foreach ($id in $ids) {
+        $packageId = $id
+        Set-PackageQuality
+    }
 }
 
 if ($localRun -eq $false)
 {   
-    $feedName = Get-VstsInput -Name feed
-    $packageId = Get-VstsInput -Name definition
-    $packageVersion = Get-VstsInput -Name version
-    $releaseView =Get-VstsInput -Name releaseView
+    $feedName = Get-VstsInput -Name feed -Require
+    $packageIds = Get-VstsInput -Name packageIds -Require
+    $packageVersion = Get-VstsInput -Name version -Require
+    $releaseView =Get-VstsInput -Name releaseView -Require
     Run
 }

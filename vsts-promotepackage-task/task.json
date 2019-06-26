@@ -37,12 +37,15 @@
       }
     },
     {
-      "name": "definition",
+      "name": "packageIds",
+      "aliases": [
+        "definition"
+      ],
       "groupName": "general",
       "type": "pickList",
       "label": "Package",
       "defaultValue": "",
-      "helpMarkDown": "Select the package that you want to promote",
+      "helpMarkDown": "Select the package that you want to promote. Multiple packages may be supplied separated with a semicolon. Note you may use either the name of the package or its GUID.",
       "required": "true",
       "properties": {
         "EditableOptions": "true"
