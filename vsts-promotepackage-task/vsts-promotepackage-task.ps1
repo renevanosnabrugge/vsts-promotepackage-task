@@ -6,45 +6,44 @@ param(
 
 function InitializeRestHeaders()
 {
-	$restHeaders = New-Object -TypeName "System.Collections.Generic.Dictionary[[String], [String]]"
-	if([string]::IsNullOrWhiteSpace($connectedServiceName))
-	{
-		$patToken = GetAccessToken $connectedServiceDetails
-		ValidatePatToken $patToken
-		$restHeaders.Add("Authorization", [String]::Concat("Bearer ", $patToken))
-		
-	}
-	else
-	{
+    $restHeaders = New-Object -TypeName "System.Collections.Generic.Dictionary[[String], [String]]"
+    if([string]::IsNullOrWhiteSpace($connectedServiceName))
+    {
+        $patToken = GetAccessToken $connectedServiceDetails
+        ValidatePatToken $patToken
+        $restHeaders.Add("Authorization", [String]::Concat("Bearer ", $patToken))
+    }
+    else
+    {
         Write-Verbose "Username = $Username" -Verbose
         if ($localRun -eq $true) {
             $Username = ""
             $Password = $env:pat
         }
         else {
-		    $Username = $connectedServiceDetails.Authorization.Parameters.Username
+            $Username = $connectedServiceDetails.Authorization.Parameters.Username
             $Password = $connectedServiceDetails.Authorization.Parameters.Password
         }
-		$alternateCreds = [String]::Concat($Username, ":", $Password)
-		$basicAuth = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($alternateCreds))
-		$restHeaders.Add("Authorization", [String]::Concat("Basic ", $basicAuth))
-	}
-	return $restHeaders
+        $alternateCreds = [String]::Concat($Username, ":", $Password)
+        $basicAuth = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($alternateCreds))
+        $restHeaders.Add("Authorization", [String]::Concat("Basic ", $basicAuth))
+    }
+    return $restHeaders
 }
 
 function GetAccessToken($vssEndPoint) 
 {
         $endpoint = (Get-VstsEndpoint -Name SystemVssConnection -Require)
-        $vssCredential = [string]$endpoint.auth.parameters.AccessToken	
+        $vssCredential = [string]$endpoint.auth.parameters.AccessToken  
         return $vssCredential
 }
 
 function ValidatePatToken($token)
 {
-	if([string]::IsNullOrWhiteSpace($token))
-	{
-		throw "Unable to generate Personal Access Token for the user. Contact Project Collection Administrator"
-	}
+    if([string]::IsNullOrWhiteSpace($token))
+    {
+        throw "Unable to generate Personal Access Token for the user. Contact Project Collection Administrator"
+    }
 }
 
 function Get-FeedId
@@ -189,33 +188,33 @@ function Set-PackageQuality
 
 function Run() {
 
-$url = $env:SYSTEM_TEAMFOUNDATIONSERVERURI 
-$url = $url.ToLower()
+    $url = $env:SYSTEM_TEAMFOUNDATIONSERVERURI
+    $url = $url.ToLower()
 
 
-if ($url  -like "https://vsrm.dev.azure.com*") {
-    #new style
-    $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://vsrm.dev.azure.com/(.*)\/", '$1').split('.')[0]
-    $basepackageurl = ("https://pkgs.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
-    $basefeedsurl = ("https://feeds.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
-}
-elseif ($url -like "https://dev.azure.com*")
-{
+    if ($url  -like "https://vsrm.dev.azure.com*") {
+        #new style
+        $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://vsrm.dev.azure.com/(.*)\/", '$1').split('.')[0]
+        $basepackageurl = ("https://pkgs.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
+        $basefeedsurl = ("https://feeds.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
+    }
+    elseif ($url -like "https://dev.azure.com*")
+    {
         #new style
         $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://dev.azure.com/(.*)\/", '$1').split('.')[0]
         $basepackageurl = ("https://pkgs.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
         $basefeedsurl = ("https://feeds.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
-}
-elseif ($url -like "*visualstudio.com*")
-{
-    #old style
-    $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
-    $basepackageurl = ("https://{0}.pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
-    $basefeedsurl = ("https://{0}.feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
-}
-else {
-    Write-Host "On-Premise TFS / Azure DevOps Server not supported"
-}
+    }
+    elseif ($url -like "*visualstudio.com*")
+    {
+        #old style
+        $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
+        $basepackageurl = ("https://{0}.pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
+        $basefeedsurl = ("https://{0}.feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
+    }
+    else {
+        Write-Host "On-Premise TFS / Azure DevOps Server not supported"
+    }
 
     $headers=InitializeRestHeaders
     Set-PackageQuality
