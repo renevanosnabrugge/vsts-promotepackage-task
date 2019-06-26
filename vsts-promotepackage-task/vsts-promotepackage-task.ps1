@@ -153,6 +153,24 @@ function Get-PackageInfo($FeedId)
     return $name, $protocolType
 }
 
+function Parse-PackageNameAndVersion([string]$filePath) {
+    $nugetRegex = '^(?<name>.*?)\.(?<version>\d+\.\d+\.\d+(?:\.\d+)?(?:-.+)?)$'
+    $npmRegex = '^(?<name>.*?)-(?<version>\d+\.\d+\.\d+(?:\.\d+)?(?:-.+)?)$'
+    $packageRegexes = $nugetRegex,$npmRegex
+    $package = New-Object -TypeName psobject
+    $package | Add-Member -MemberType NoteProperty -Name Name -Value ''
+    $package | Add-Member -MemberType NoteProperty -Name Version -Value ''
+    $fileName = [System.IO.Path]::GetFileNameWithoutExtension($filePath)
+    $match = [regex]::Match($fileName, ($packageRegexes -join '|'))
+    if ($match.Success) {
+        $package.Name = $match.Groups['name'].Value
+        $package.Version = $match.Groups['version'].Value
+    } else {
+        throw [System.FormatException] "'$fileName' is not a recognized format for NuGet or npm."
+    }
+    return $package
+}
+
 function Set-PackageQuality
 {
     Write-Host "Promoting version $packageVersion of package $packageId from feed $feedName to view $releaseView"
@@ -221,24 +239,45 @@ function Initalize-Request() {
 
 function Run() {
     Initalize-Request
+    if ($inputType -eq "nameVersion") {
+        $packageIds = Get-VstsInput -Name packageIds -Require
+        $packageVersion = Get-VstsInput -Name version -Require
 
-    $ids = $packageIds -Split ';'
-    if ($ids.Length -gt 1) {
-        Write-Host "Promoting multiple packages named '$packageIds' with version '$packageVersion'"
-    } else {
-        Write-Host "Promoting single package named '$packageIds' with version '$packageVersion'"
-    }
-    foreach ($id in $ids) {
-        $packageId = $id
-        Set-PackageQuality
+        $ids = $packageIds -Split ';'
+        if ($ids.Length -gt 1) {
+            Write-Host "Promoting multiple packages named '$packageIds' with version '$packageVersion'"
+        } else {
+            Write-Host "Promoting single package named '$packageIds' with version '$packageVersion'"
+        }
+        foreach ($id in $ids) {
+            $packageId = $id
+            Set-PackageQuality
+        }
+    } else { # ($inputType -eq "packageFiles")
+        $packagesDirectory = Get-VstsInput -Name packagesDirectory -Require
+        $packagesPatternParse = Get-VstsInput -Name packagesPatternParse -Require
+
+        if (!(Test-Path $packagesDirectory)) {
+            Write-Error "The path '$packagesDirectory' doesn't exist."
+        }
+        $patterns = $packagesPatternParse -Split '\n|;'
+        Write-Host "Promoting multiple package names/version by parsing package files matching pattern '$patterns' from root directory '$packagesDirectory'"
+
+        $paths = Find-VstsMatch -DefaultRoot $packagesDirectory -Pattern $patterns
+        Write-Host "Matching paths found:`n$paths"
+        foreach ($path in $paths) {
+            $package = Parse-PackageNameAndVersion($path)
+            $packageId = $package.Name
+            $packageVersion = $package.Version
+            Set-PackageQuality
+        }
     }
 }
 
 if ($localRun -eq $false)
 {   
     $feedName = Get-VstsInput -Name feed -Require
-    $packageIds = Get-VstsInput -Name packageIds -Require
-    $packageVersion = Get-VstsInput -Name version -Require
-    $releaseView =Get-VstsInput -Name releaseView -Require
+    $inputType = Get-VstsInput -Name inputType -Require
+    $releaseView = Get-VstsInput -Name releaseView -Require
     Run
 }
