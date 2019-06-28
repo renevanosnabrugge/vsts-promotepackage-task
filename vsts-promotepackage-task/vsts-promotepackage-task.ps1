@@ -33,9 +33,9 @@ function InitializeRestHeaders()
 
 function GetAccessToken($vssEndPoint) 
 {
-        $endpoint = (Get-VstsEndpoint -Name SystemVssConnection -Require)
-        $vssCredential = [string]$endpoint.auth.parameters.AccessToken  
-        return $vssCredential
+    $endpoint = (Get-VstsEndpoint -Name SystemVssConnection -Require)
+    $vssCredential = [string]$endpoint.auth.parameters.AccessToken
+    return $vssCredential
 }
 
 function ValidatePatToken($token)
@@ -192,7 +192,7 @@ function Set-PackageQuality
         default { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
     }
 
-     $json = @{
+    $json = @{
         views = @{
             op = "add"
             path = "/views/-"
