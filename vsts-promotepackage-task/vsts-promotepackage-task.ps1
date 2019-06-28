@@ -58,7 +58,8 @@ function Get-FeedId
     }
     catch
     {
-        throw "Unhandled exception while reading feed $feedName"
+        $ex = [string]::Concat($_.Exception.ToString(), $_.ScriptStackTrace)
+        throw "Unhandled exception while reading feed $feedName`n$ex"
     }
 
     # If the feed id is empty throw an exception (fallback scenario)
@@ -82,7 +83,8 @@ function Get-ViewId($FeedId)
     }
     catch
     {
-        throw "Unhandled exception while reading view $releaseView"
+        $ex = [string]::Concat($_.Exception.ToString(), $_.ScriptStackTrace)
+        throw "Unhandled exception while reading view $releaseView`n$ex"
     }
 
     # If the view id is empty throw an exception (fallback scenario)
@@ -115,7 +117,8 @@ function Get-PackageInfo($FeedId)
     }
     catch
     {
-        throw "Unhandled exception while reading package $packageId by id"
+        $ex = [string]::Concat($_.Exception.ToString(), $_.ScriptStackTrace)
+        throw "Unhandled exception while reading package $packageId by id`n$ex"
     }
 
     # Package not found with id, searching with name
@@ -139,8 +142,9 @@ function Get-PackageInfo($FeedId)
         }
         catch
         {
-            Write-Verbose -Verbose "Failed to retrieve package information by name"
-            throw "Unhandled exception while reading package $packageId by name"
+            $ex = [string]::Concat($_.Exception.ToString(), $_.ScriptStackTrace)
+            Write-Verbose -Verbose "Failed to retrieve package information by name`n$ex"
+            throw "Unhandled exception while reading package $packageId by name`n$ex"
         }
     }
 
