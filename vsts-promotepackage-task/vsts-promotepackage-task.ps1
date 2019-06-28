@@ -243,7 +243,7 @@ function Run() {
         $packageIds = Get-VstsInput -Name packageIds -Require
         $packageVersion = Get-VstsInput -Name version -Require
 
-        $ids = $packageIds -Split ';'
+        $ids = $packageIds -Split ',|;'
         if ($ids.Length -gt 1) {
             Write-Host "Promoting multiple packages named '$packageIds' with version '$packageVersion'"
         } else {

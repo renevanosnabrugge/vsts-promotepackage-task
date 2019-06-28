@@ -48,10 +48,11 @@
       "type": "pickList",
       "label": "Package",
       "defaultValue": "",
-      "helpMarkDown": "Select the package that you want to promote. Multiple packages may be supplied separated with a semicolon. Note you may use either the name of the package or its GUID.",
+      "helpMarkDown": "Select the package that you want to promote. Multiple packages may be supplied separated with a comma or semicolon. Note you may use either the name of the package or its GUID.",
       "required": "true",
       "properties": {
-        "EditableOptions": "true"
+        "EditableOptions": "true",
+        "MultiSelectFlatList": "True"
       },
       "visibleRule": "inputType = nameVersion"
     },
@@ -111,7 +112,7 @@
       "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
     },
     {
-      "target": "definition",
+      "target": "packageIds",
       "endpointId": "tfs:feed",
       "parameters": {
         "feed": "$(feed)"
@@ -125,9 +126,9 @@
       "endpointId": "tfs:feed",
       "parameters": {
         "feed": "$(feed)",
-        "definition": "$(definition)"
+        "packageIds": "$(packageIds)"
       },
-      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages/{{{definition}}}/Versions?includeUrls=false",
+      "endpointUrl": "{{endpoint.url}}/_apis/Packaging/Feeds/{{{feed}}}/Packages/{{{packageIds}}}/Versions?includeUrls=false",
       "resultSelector": "jsonpath:$.value[*]",
       "resultTemplate": "{ \"Value\" : \"{{{version}}}\", \"DisplayValue\" : \"{{{version}}}\" }"
     },
