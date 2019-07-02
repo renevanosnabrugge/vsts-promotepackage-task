@@ -157,24 +157,6 @@ function Get-PackageInfo($FeedId)
     return $name, $protocolType
 }
 
-function Parse-PackageNameAndVersion([string]$filePath) {
-    $nugetRegex = '^(?<name>.*?)\.(?<version>\d+\.\d+\.\d+(?:\.\d+)?(?:-.+)?)$'
-    $npmRegex = '^(?<name>.*?)-(?<version>\d+\.\d+\.\d+(?:\.\d+)?(?:-.+)?)$'
-    $packageRegexes = $nugetRegex,$npmRegex
-    $package = New-Object -TypeName psobject
-    $package | Add-Member -MemberType NoteProperty -Name Name -Value ''
-    $package | Add-Member -MemberType NoteProperty -Name Version -Value ''
-    $fileName = [System.IO.Path]::GetFileNameWithoutExtension($filePath)
-    $match = [regex]::Match($fileName, ($packageRegexes -join '|'))
-    if ($match.Success) {
-        $package.Name = $match.Groups['name'].Value
-        $package.Version = $match.Groups['version'].Value
-    } else {
-        throw [System.FormatException] "'$fileName' is not a recognized format for NuGet or npm."
-    }
-    return $package
-}
-
 function Set-PackageQuality
 {
     Write-Host "Promoting version $packageVersion of package $packageId from feed $feedName to view $releaseView"
@@ -241,6 +223,66 @@ function Initalize-Request() {
     $headers=InitializeRestHeaders
 }
 
+function New-TemporaryDirectory {
+    $parent = [System.IO.Path]::GetTempPath()
+    [string]$name = [System.Guid]::NewGuid()
+    New-Item -ItemType Directory -Path (Join-Path $parent $name)
+}
+
+function New-PackageObject {
+    $package = New-Object -TypeName PSObject
+    $package | Add-Member -MemberType NoteProperty -Name Name -Value ''
+    $package | Add-Member -MemberType NoteProperty -Name Version -Value ''
+    return $package
+}
+
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Get-NuGetPackageMetadata([string]$filePath) {
+    $package = New-PackageObject
+    $zip = [System.IO.Compression.ZipFile]::OpenRead($filePath)
+    $tempFilePath = (New-TemporaryFile).FullName
+    try {
+        $nuspecEntry = $zip.Entries | Where-Object { $_.FullName -like '*.nuspec' } | Select-Object -First 1
+        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($nuspecEntry, $tempFilePath, $true)
+        $ns = @{ msxml = "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd" }
+        $metadata = Select-Xml -Path $tempFilePath -Namespace $ns -XPath "//msxml:metadata" | Select-Object -ExpandProperty Node | Select-Object -ExpandProperty ChildNodes
+        $package.Name = ($metadata | Where-Object {$_.Name -eq 'id' } | Select-Object -First 1).InnerText
+        $package.Version = ($metadata | Where-Object {$_.Name -eq 'version' } | Select-Object -First 1).InnerText
+    } finally {
+        Remove-Item $tempFilePath -Force -ErrorAction SilentlyContinue
+        $zip.Dispose()
+    }
+    return $package
+}
+
+function Get-NpmPackageMetadata([string]$filePath) {
+    $package = New-PackageObject
+    $tempDir = New-TemporaryDirectory
+    try {
+        if ($IsWindows -eq $null) {
+            $IsWindows = $Env:OS.StartsWith('Windows')
+        }
+        $flags = if ($IsWindows) { '-xvzf' } else { 'xvzf' }
+        tar $flags `"$filePath`" -C `"$tempDir`" 2> $null
+        $packageJsonPath = "$tempDir/package/package.json"
+        $packageJson = Get-Content -Raw -Path $packageJsonPath | ConvertFrom-Json
+        $package.Name = $packageJson.name
+        $package.Version = $packageJson.version
+    } finally {
+        Remove-Item $tempDir -Force -Recurse -ErrorAction SilentlyContinue
+    }
+    return $package
+}
+
+function Get-PackageMetadata([string]$filePath) {
+    $extension = [System.IO.Path]::GetExtension($filePath)
+    if ($extension -eq '.nupkg') {
+        return Get-NuGetPackageMetadata $filePath
+    } else { # ($extension -eq '.tgz')
+        return Get-NpmPackageMetadata $filePath
+    }
+}
+
 function Run() {
     Initalize-Request
     if ($inputType -eq "nameVersion") {
@@ -270,7 +312,7 @@ function Run() {
         $paths = Find-VstsMatch -DefaultRoot $packagesDirectory -Pattern $patterns
         Write-Host "Matching paths found:`n$paths"
         foreach ($path in $paths) {
-            $package = Parse-PackageNameAndVersion($path)
+            $package = Get-PackageMetadata $path
             $packageId = $package.Name
             $packageVersion = $package.Version
             Set-PackageQuality
