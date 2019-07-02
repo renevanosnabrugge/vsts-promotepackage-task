@@ -33,11 +33,11 @@
       "type": "radio",
       "label": "Package input type",
       "defaultValue": "nameVersion",
-      "helpMarkDown": "Preferred input type. Either specify the name and version explicitly, or parse one or multiple names and versions from package files. The conventions used are the same as the defaults from standard packaging tools (NuGet pack, dotnet pack, npm pack, etc).",
+      "helpMarkDown": "Preferred input type. Either specify the name(s) and version explicitly, or retrieve name(s) and version(s) from metadata of package file(s).",
       "required": "true",
       "options": {
         "nameVersion": "Specify name and version",
-        "packageFiles": "Parse name(s) and version(s) from package files"
+        "packageFiles": "Get name(s) and version(s) from metadata of package file(s)"
       }
     },
     {
@@ -61,7 +61,7 @@
       "type": "string",
       "label": "Package Version",
       "defaultValue": "",
-      "helpMarkDown": "Enter the version you want to promote or a variable.",
+      "helpMarkDown": "Enter the version you want to promote or a [variable](https://go.microsoft.com/fwlink/?LinkID=550988).",
       "required": "true",
       "visibleRule": "inputType = nameVersion"
     },
@@ -70,16 +70,16 @@
       "type": "filePath",
       "label": "Package source folder",
       "defaultValue": "$(System.DefaultWorkingDirectory)",
-      "helpMarkDown": "The source folder that the copy pattern(s) will be run from.",
+      "helpMarkDown": "The source folder that the package file pattern(s) will be searched in.",
       "required": "true",
       "visibleRule": "inputType = packageFiles"
     },
     {
-      "name": "packagesPatternParse",
+      "name": "packagesPattern",
       "type": "multiLine",
-      "label": "Package contents",
+      "label": "Package file paths",
       "defaultValue": "**/*.nupkg\n!**/*.symbols.nupkg\n**/*.tgz",
-      "helpMarkDown": "The glob pattern to match or path to nupkg/tgz files to be parsed for package ID and version. Multiple patterns can be separated by a semicolon or be placed on separate lines.",
+      "helpMarkDown": "The file paths or glob pattern to match nupkg/tgz files within the package source folder containing the package name and versions (as metadata) that will be promoted. Multiple patterns can be separated by a semicolon or be placed on separate lines.",
       "required": "true",
       "properties": {
         "resizable": "true",

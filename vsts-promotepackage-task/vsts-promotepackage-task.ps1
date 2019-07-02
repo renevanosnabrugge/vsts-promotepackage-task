@@ -297,12 +297,12 @@ function Run() {
         }
     } else { # ($inputType -eq "packageFiles")
         $packagesDirectory = Get-VstsInput -Name packagesDirectory -Require
-        $packagesPatternParse = Get-VstsInput -Name packagesPatternParse -Require
+        $packagesPattern = Get-VstsInput -Name packagesPattern -Require
 
         if (!(Test-Path $packagesDirectory)) {
             Write-Error "The path '$packagesDirectory' doesn't exist."
         }
-        $patterns = $packagesPatternParse -Split '\n|;'
+        $patterns = $packagesPattern -Split '\n|;'
         Write-Host "Promoting package(s) by reading metadata from package file(s) matching pattern '$patterns' from root directory '$packagesDirectory'"
 
         $paths = Find-VstsMatch -DefaultRoot $packagesDirectory -Pattern $patterns
