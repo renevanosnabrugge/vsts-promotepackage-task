@@ -46,14 +46,14 @@ function ValidatePatToken($token)
     }
 }
 
-function Get-FeedId
+function Get-FeedId ([PSObject]$requestContext, [string]$feedName)
 {
     $ret = ""
     try
     {
-        $feedUrl = "$basefeedsurl/$feedName/?api-version=5.0-preview.1"
+        $feedUrl = "$($requestContext.BaseFeedUrl)/$feedName/?api-version=5.0-preview.1"
         Write-Verbose -Verbose "Trying to retrieve feed information: $feedUrl"
-        $feedResponse = Invoke-RestMethod -Uri $feedUrl -Headers $headers -ContentType "application/json" -Method Get
+        $feedResponse = Invoke-RestMethod -Uri $feedUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
         $ret = $feedResponse.id
     }
     catch
@@ -71,14 +71,14 @@ function Get-FeedId
     return $ret
 }
 
-function Get-ViewId($FeedId)
+function Get-ViewId([PSObject]$requestContext, [string]$FeedId, [string]$releaseView)
 {
     $ret = ""
     try
     {
-        $viewUrl = "$basefeedsurl/$FeedId/views/$releaseView/?api-version=5.0-preview.1"
+        $viewUrl = "$($requestContext.BaseFeedUrl)/$FeedId/views/$releaseView/?api-version=5.0-preview.1"
         Write-Verbose -Verbose "Trying to retrieve view information: $viewUrl"
-        $viewResponse = Invoke-RestMethod -Uri $viewUrl -Headers $headers -ContentType "application/json" -Method Get
+        $viewResponse = Invoke-RestMethod -Uri $viewUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
         $ret = $viewResponse.id
     }
     catch
@@ -96,20 +96,18 @@ function Get-ViewId($FeedId)
     return $ret
 }
 
-function Get-PackageInfo($FeedId)
+function Get-PackageInfo([PSObject]$requestContext, [string]$FeedId, [string]$packageId)
 {
     $name = "";
     $protocolType = "";
-    #$ret = ""
     $isId = $true
     try
     {
-        $packageUrl = "$basefeedsurl/$FeedId/packages/$packageId/?api-version=5.0-preview.1"
+        $packageUrl = "$($requestContext.BaseFeedUrl)/$FeedId/packages/$packageId/?api-version=5.0-preview.1"
         Write-Verbose -Verbose "Trying to retrieve package information: $packageUrl"
-        $packageResponse = Invoke-RestMethod -Uri $packageUrl -Headers $headers -ContentType "application/json" -Method Get
+        $packageResponse = Invoke-RestMethod -Uri $packageUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
         $name = $packageResponse.normalizedName
         $protocolType = $packageResponse.protocolType
-        #$ret = $packageResponse.id
     }
     catch [System.Net.WebException]
     {
@@ -127,9 +125,9 @@ function Get-PackageInfo($FeedId)
         try
         {
             Write-Verbose -Verbose "Package with id $packageId not found, searching with name"
-            $packagesUrl = "$basefeedsurl/$FeedId/packages?api-version=5.0-preview.1"
+            $packagesUrl = "$($requestContext.BaseFeedUrl)/$FeedId/packages?api-version=5.0-preview.1"
             Write-Verbose -Verbose "Retrieving all packages of requested feed: $packagesUrl"
-            $packagesResponse = Invoke-RestMethod -Uri $packagesUrl -Headers $headers -ContentType "application/json" -Method Get
+            $packagesResponse = Invoke-RestMethod -Uri $packagesUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
             $packages = $packagesResponse.value
             foreach ($package in $packages)
             {
@@ -137,6 +135,7 @@ function Get-PackageInfo($FeedId)
                 {
                     $name = $package.normalizedName
                     $protocolType = $package.protocolType
+                    break
                 }
             }
         }
@@ -154,28 +153,31 @@ function Get-PackageInfo($FeedId)
         throw "Package $packageId could not be found"
     }
 
-    return $name, $protocolType
+    [PSCustomObject]@{
+        Name = $name
+        FeedType = $protocolType
+    }
 }
 
-function Set-PackageQuality
+function Set-PackageQuality([PSObject]$requestContext, [string]$feedName, [string]$packageId, [string]$packageVersion, [string]$releaseView)
 {
     Write-Host "Promoting version $packageVersion of package $packageId from feed $feedName to view $releaseView"
 
     # Get ids for feed, package and view
-    $feedId = Get-FeedId
-    $viewId = Get-ViewId -FeedId $feedId
-    $packageInfo = Get-PackageInfo -FeedId $feedId
-    $packageName = $packageInfo[0]
-    $feedType = $packageInfo[1]
+    $feedId = Get-FeedId -RequestContext $requestContext -FeedName $feedName
+    $viewId = Get-ViewId -RequestContext $requestContext -FeedId $feedId -ReleaseView $releaseView
+    $packageInfo = Get-PackageInfo -RequestContext $requestContext -FeedId $feedId -PackageId $packageId
+    $packageName = $packageInfo.Name
+    $feedType = $packageInfo.FeedType
 
     #API URL is slightly different for npm vs. nuget...
     switch($feedType)
     {
-        "npm" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
-        "nuget" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
-        "upack" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
-        "pypi" { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
-        default { $releaseViewURL = "$basepackageurl/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "npm"    { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "nuget"  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "upack"  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "pypi"   { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        default  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
     }
 
     $json = @{
@@ -186,11 +188,11 @@ function Set-PackageQuality
         }
     }
     Write-Host $releaseViewURL
-    $response = Invoke-RestMethod -Uri $releaseViewURL -Headers $headers -ContentType "application/json" -Method Patch -Body (ConvertTo-Json $json)
+    $response = Invoke-RestMethod -Uri $releaseViewURL -Headers $requestContext.Headers -ContentType "application/json" -Method Patch -Body (ConvertTo-Json $json)
     return $response
 }
 
-function Initalize-Request() {
+function Initalize-RequestContext() {
 
     $url = $env:SYSTEM_TEAMFOUNDATIONSERVERURI
     $url = $url.ToLower()
@@ -221,6 +223,12 @@ function Initalize-Request() {
     }
 
     $headers=InitializeRestHeaders
+
+    [PSCustomObject]@{
+        BasePackageUrl = $basepackageurl
+        BaseFeedUrl = $basefeedsurl
+        Headers = $headers
+    }
 }
 
 function New-TemporaryDirectory {
@@ -284,7 +292,11 @@ function Get-PackageMetadata([string]$filePath) {
 }
 
 function Run() {
-    Initalize-Request
+    $feedName = Get-VstsInput -Name feed -Require
+    $inputType = Get-VstsInput -Name inputType -Require
+    $releaseView = Get-VstsInput -Name releaseView -Require
+    $requestContext = Initalize-RequestContext
+
     if ($inputType -eq "nameVersion") {
         $packageIds = Get-VstsInput -Name packageIds -Require
         $packageVersion = Get-VstsInput -Name version -Require
@@ -292,8 +304,7 @@ function Run() {
         $ids = $packageIds -Split ',|;'
         Write-Host "Promoting $($ids.Length) package(s) named '$packageIds' with version '$packageVersion'"
         foreach ($id in $ids) {
-            $packageId = $id
-            Set-PackageQuality
+            Set-PackageQuality -RequestContext $requestContext -FeedName $feedName -PackageId $id -PackageVersion $packageVersion -ReleaseView $releaseView
         }
     } else { # ($inputType -eq "packageFiles")
         $packagesDirectory = Get-VstsInput -Name packagesDirectory -Require
@@ -309,17 +320,12 @@ function Run() {
         Write-Host "Matching paths found:`n$paths"
         foreach ($path in $paths) {
             $package = Get-PackageMetadata $path
-            $packageId = $package.Name
-            $packageVersion = $package.Version
-            Set-PackageQuality
+            Set-PackageQuality -RequestContext $requestContext -FeedName $feedName -PackageId $package.Name -PackageVersion $package.Version -ReleaseView $releaseView
         }
     }
 }
 
 if ($localRun -eq $false)
 {   
-    $feedName = Get-VstsInput -Name feed -Require
-    $inputType = Get-VstsInput -Name inputType -Require
-    $releaseView = Get-VstsInput -Name releaseView -Require
     Run
 }
