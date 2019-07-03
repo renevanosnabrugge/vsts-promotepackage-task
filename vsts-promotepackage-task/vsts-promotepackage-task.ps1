@@ -4,23 +4,18 @@ param(
 )
 
 
-function InitializeRestHeaders()
-{
+function InitializeRestHeaders() {
     $restHeaders = New-Object -TypeName "System.Collections.Generic.Dictionary[[String], [String]]"
-    if([string]::IsNullOrWhiteSpace($connectedServiceName))
-    {
+    if([string]::IsNullOrWhiteSpace($connectedServiceName)) {
         $patToken = GetAccessToken $connectedServiceDetails
         ValidatePatToken $patToken
         $restHeaders.Add("Authorization", [String]::Concat("Bearer ", $patToken))
-    }
-    else
-    {
+    } else {
         Write-Verbose "Username = $Username" -Verbose
         if (![string]::IsNullOrWhiteSpace($env:PROMOTEPACKAGE_PAT)) {
             $Username = ""
             $Password = $env:PROMOTEPACKAGE_PAT
-        }
-        else {
+        } else {
             $Username = $connectedServiceDetails.Authorization.Parameters.Username
             $Password = $connectedServiceDetails.Authorization.Parameters.Password
         }
@@ -31,116 +26,91 @@ function InitializeRestHeaders()
     return $restHeaders
 }
 
-function GetAccessToken($vssEndPoint) 
-{
+function GetAccessToken($vssEndPoint) {
     $endpoint = (Get-VstsEndpoint -Name SystemVssConnection -Require)
     $vssCredential = [string]$endpoint.auth.parameters.AccessToken
     return $vssCredential
 }
 
-function ValidatePatToken($token)
-{
-    if([string]::IsNullOrWhiteSpace($token))
-    {
+function ValidatePatToken($token) {
+    if([string]::IsNullOrWhiteSpace($token)) {
         throw "Unable to generate Personal Access Token for the user. Contact Project Collection Administrator"
     }
 }
 
-function Get-FeedId([PSObject]$requestContext, [string]$feedName)
-{
+function Get-FeedId([PSObject]$requestContext, [string]$feedName) {
     $ret = ""
-    try
-    {
+    try {
         $feedUrl = "$($requestContext.BaseFeedUrl)/$feedName/?api-version=5.0-preview.1"
         Write-Verbose -Verbose "Trying to retrieve feed information: $feedUrl"
         $feedResponse = Invoke-RestMethod -Uri $feedUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
         $ret = $feedResponse.id
-    }
-    catch
-    {
+    } catch {
         $ex = [string]::Concat($_.Exception.ToString(), $_.ScriptStackTrace)
         throw "Unhandled exception while reading feed $feedName`n$ex"
     }
 
     # If the feed id is empty throw an exception (fallback scenario)
-    if ([string]::IsNullOrWhiteSpace($ret))
-    {
+    if ([string]::IsNullOrWhiteSpace($ret)) {
         throw "Feed $feedName could not be found"
     }
 
     return $ret
 }
 
-function Get-ViewId([PSObject]$requestContext, [string]$FeedId, [string]$releaseView)
-{
+function Get-ViewId([PSObject]$requestContext, [string]$FeedId, [string]$releaseView) {
     $ret = ""
-    try
-    {
+    try {
         $viewUrl = "$($requestContext.BaseFeedUrl)/$FeedId/views/$releaseView/?api-version=5.0-preview.1"
         Write-Verbose -Verbose "Trying to retrieve view information: $viewUrl"
         $viewResponse = Invoke-RestMethod -Uri $viewUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
         $ret = $viewResponse.id
-    }
-    catch
-    {
+    } catch {
         $ex = [string]::Concat($_.Exception.ToString(), $_.ScriptStackTrace)
         throw "Unhandled exception while reading view $releaseView`n$ex"
     }
 
     # If the view id is empty throw an exception (fallback scenario)
-    if ([string]::IsNullOrWhiteSpace($ret))
-    {
+    if ([string]::IsNullOrWhiteSpace($ret)) {
         throw "View $releaseView could not be found"
     }
 
     return $ret
 }
 
-function Get-PackageInfo([PSObject]$requestContext, [string]$FeedId, [string]$packageId)
-{
+function Get-PackageInfo([PSObject]$requestContext, [string]$FeedId, [string]$packageId) {
     $name = "";
     $protocolType = "";
     $isId = $true
-    try
-    {
+    try {
         $packageUrl = "$($requestContext.BaseFeedUrl)/$FeedId/packages/$packageId/?api-version=5.0-preview.1"
         Write-Verbose -Verbose "Trying to retrieve package information: $packageUrl"
         $packageResponse = Invoke-RestMethod -Uri $packageUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
         $name = $packageResponse.normalizedName
         $protocolType = $packageResponse.protocolType
-    }
-    catch [System.Net.WebException]
-    {
+    } catch [System.Net.WebException] {
         $isId = $false
-    }
-    catch
-    {
+    } catch {
         $ex = [string]::Concat($_.Exception.ToString(), $_.ScriptStackTrace)
         throw "Unhandled exception while reading package $packageId by id`n$ex"
     }
 
     # Package not found with id, searching with name
-    if ($isId -eq $false)
-    {
-        try
-        {
+    if ($isId -eq $false) {
+        try {
             Write-Verbose -Verbose "Package with id $packageId not found, searching with name"
             $packagesUrl = "$($requestContext.BaseFeedUrl)/$FeedId/packages?api-version=5.0-preview.1"
             Write-Verbose -Verbose "Retrieving all packages of requested feed: $packagesUrl"
             $packagesResponse = Invoke-RestMethod -Uri $packagesUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
             $packages = $packagesResponse.value
-            foreach ($package in $packages)
-            {
-                if ($package.name -eq $packageId)
-                {
+            foreach ($package in $packages) {
+                if ($package.name -eq $packageId) {
                     $name = $package.normalizedName
                     $protocolType = $package.protocolType
                     break
                 }
             }
-        }
-        catch
-        {
+        } catch {
             $ex = [string]::Concat($_.Exception.ToString(), $_.ScriptStackTrace)
             Write-Verbose -Verbose "Failed to retrieve package information by name`n$ex"
             throw "Unhandled exception while reading package $packageId by name`n$ex"
@@ -148,8 +118,7 @@ function Get-PackageInfo([PSObject]$requestContext, [string]$FeedId, [string]$pa
     }
 
     # If the package id is empty throw an exception (fallback scenario)
-    if ([string]::IsNullOrWhiteSpace($name) -or [string]::IsNullOrWhiteSpace($protocolType))
-    {
+    if ([string]::IsNullOrWhiteSpace($name) -or [string]::IsNullOrWhiteSpace($protocolType)) {
         throw "Package $packageId could not be found"
     }
 
@@ -159,8 +128,7 @@ function Get-PackageInfo([PSObject]$requestContext, [string]$FeedId, [string]$pa
     }
 }
 
-function Set-PackageQuality([PSObject]$requestContext, [string]$feedName, [string]$packageId, [string]$packageVersion, [string]$releaseView)
-{
+function Set-PackageQuality([PSObject]$requestContext, [string]$feedName, [string]$packageId, [string]$packageVersion, [string]$releaseView) {
     Write-Host "Promoting version $packageVersion of package $packageId from feed $feedName to view $releaseView"
 
     # Get ids for feed, package and view
@@ -171,8 +139,7 @@ function Set-PackageQuality([PSObject]$requestContext, [string]$feedName, [strin
     $feedType = $packageInfo.FeedType
 
     #API URL is slightly different for npm vs. nuget...
-    switch($feedType)
-    {
+    switch($feedType) {
         "npm"    { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
         "nuget"  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
         "upack"  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
@@ -315,7 +282,6 @@ function Run() {
     }
 }
 
-if ($localRun -eq $false)
-{   
+if ($localRun -eq $false) {
     Run
 }
