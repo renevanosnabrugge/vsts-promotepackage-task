@@ -291,7 +291,7 @@ function Run() {
         $packageIds = Get-VstsInput -Name packageIds -Require
         $packageVersion = Get-VstsInput -Name version -Require
 
-        $ids = $packageIds -Split ',|;'
+        $ids = $packageIds -Split ',\s*|;\s*'
         Write-Host "Promoting $($ids.Length) package(s) named '$packageIds' with version '$packageVersion'"
         foreach ($id in $ids) {
             Set-PackageQuality -RequestContext $requestContext -FeedName $feedName -PackageId $id -PackageVersion $packageVersion -ReleaseView $releaseView
@@ -303,7 +303,7 @@ function Run() {
         if (!(Test-Path $packagesDirectory)) {
             Write-Error "The path '$packagesDirectory' doesn't exist."
         }
-        $patterns = $packagesPattern -Split '\n|;'
+        $patterns = $packagesPattern -Split '\n|;\s*'
         Write-Host "Promoting package(s) by reading metadata from package file(s) matching pattern '$patterns' from root directory '$packagesDirectory'"
 
         $paths = Find-VstsMatch -DefaultRoot $packagesDirectory -Pattern $patterns
