@@ -16,9 +16,9 @@ function InitializeRestHeaders()
     else
     {
         Write-Verbose "Username = $Username" -Verbose
-        if ($localRun -eq $true) {
+        if (![string]::IsNullOrWhiteSpace($env:PROMOTEPACKAGE_PAT)) {
             $Username = ""
-            $Password = $env:pat
+            $Password = $env:PROMOTEPACKAGE_PAT
         }
         else {
             $Username = $connectedServiceDetails.Authorization.Parameters.Username
