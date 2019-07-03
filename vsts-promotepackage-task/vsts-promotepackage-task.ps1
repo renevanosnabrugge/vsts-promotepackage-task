@@ -46,7 +46,7 @@ function ValidatePatToken($token)
     }
 }
 
-function Get-FeedId ([PSObject]$requestContext, [string]$feedName)
+function Get-FeedId([PSObject]$requestContext, [string]$feedName)
 {
     $ret = ""
     try
@@ -193,36 +193,26 @@ function Set-PackageQuality([PSObject]$requestContext, [string]$feedName, [strin
 }
 
 function Initalize-RequestContext() {
+    $basepackageurl = ""
+    $basefeedsurl = ""
+    $uri = [uri]$env:SYSTEM_TEAMFOUNDATIONSERVERURI
+    $hostName = $uri.Host
 
-    $url = $env:SYSTEM_TEAMFOUNDATIONSERVERURI
-    $url = $url.ToLower()
-
-
-    if ($url  -like "https://vsrm.dev.azure.com*") {
+    if (($hostName -eq "dev.azure.com") -or ($hostName -eq "vsrm.dev.azure.com")) {
         #new style
-        $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://vsrm.dev.azure.com/(.*)\/", '$1').split('.')[0]
-        $basepackageurl = ("https://pkgs.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
-        $basefeedsurl = ("https://feeds.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
-    }
-    elseif ($url -like "https://dev.azure.com*")
-    {
-        #new style
-        $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://dev.azure.com/(.*)\/", '$1').split('.')[0]
-        $basepackageurl = ("https://pkgs.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
-        $basefeedsurl = ("https://feeds.dev.azure.com/{0}/_apis/packaging/feeds" -f $account)
-    }
-    elseif ($url -like "*visualstudio.com*")
-    {
+        $account = $uri.Segments[1].TrimEnd('/') # First segment after hostname
+        $basepackageurl = "https://pkgs.dev.azure.com/$($account)/_apis/packaging/feeds"
+        $basefeedsurl = "https://feeds.dev.azure.com/$($account)/_apis/packaging/feeds"
+    } elseif ($hostName.EndsWith("visualstudio.com")) {
         #old style
-        $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
-        $basepackageurl = ("https://{0}.pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
-        $basefeedsurl = ("https://{0}.feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds" -f $account)
-    }
-    else {
+        $account = $hostName.Split('.')[0] # First subdomain of hostname
+        $basepackageurl = "https://$($account).pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds"
+        $basefeedsurl = "https://$($account).feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds"
+    } else {
         Write-Host "On-Premise TFS / Azure DevOps Server not supported"
     }
 
-    $headers=InitializeRestHeaders
+    $headers = InitializeRestHeaders
 
     [PSCustomObject]@{
         BasePackageUrl = $basepackageurl

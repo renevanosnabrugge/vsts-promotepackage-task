@@ -4,24 +4,18 @@ function Get-Account() {
         $url
     )
 
-    if ($url  -like "https://vsrm.dev.azure.com*") {
+    $uri = [uri]$url
+    $hostName = $uri.Host
+
+    if (($hostName -eq "dev.azure.com") -or ($hostName -eq "vsrm.dev.azure.com")) {
         #new style
-        $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://vsrm.dev.azure.com/(.*)(\/)", '$1').split('.')[0]
-    return $account
-    }
-    elseif ($url -like "https://dev.azure.com*")
-    {
-            #new style
-            $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://dev.azure.com/(.*)(\/)", '$1').split('.')[0]
-            return $account
-        }
-    elseif ($url -like "*visualstudio.com*")
-    {
-        #old style
-        $account = ($env:SYSTEM_TEAMFOUNDATIONSERVERURI -replace "https://(.*)\.visualstudio\.com/", '$1').split('.')[0]
+        $account = $uri.Segments[1].TrimEnd('/') # First segment after hostname
         return $account
-    }
-    else {
+    } elseif ($hostName.EndsWith("visualstudio.com")) {
+        #old style
+        $account = $hostName.Split('.')[0] # First subdomain of hostname
+        return $account
+    } else {
         Write-Host "On-Premise TFS / Azure DevOps Server not supported"
     }
 }
