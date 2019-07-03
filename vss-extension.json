@@ -28,7 +28,10 @@
       "path": "extension/Images/Screenshots/add-task.png"
     },
     {
-      "path": "extension/Images/Screenshots/task-config.png"
+      "path": "extension/Images/Screenshots/task-config-name-version.png"
+    },
+    {
+      "path": "extension/Images/Screenshots/task-config-packages.png"
     }
   ],
   "content": {
