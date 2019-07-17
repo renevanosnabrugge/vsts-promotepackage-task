@@ -14,7 +14,7 @@
   ],
   "description": "This task promotes a package to a Release View in Azure DevOps Artifacts",
   "categories": [
-    "Build and release"
+    "Azure Pipelines"
   ],
   "tags": [
     "Extension",
@@ -28,7 +28,10 @@
       "path": "extension/Images/Screenshots/add-task.png"
     },
     {
-      "path": "extension/Images/Screenshots/task-config.png"
+      "path": "extension/Images/Screenshots/task-config-name-version.png"
+    },
+    {
+      "path": "extension/Images/Screenshots/task-config-packages.png"
     }
   ],
   "content": {
