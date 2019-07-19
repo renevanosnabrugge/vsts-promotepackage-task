@@ -5,6 +5,7 @@
 >>**7-19-2019**
 > - Major update for Promotion of multiple packages in one go (by specifying the package ids separated by semicolons) described in detail in this [Pull Request](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/25)
 > - All credits go to [Shad Storhaug](https://github.com/NightOwl888) for all his hard work on this
+> - Changed this update to a major update (2.x) and reverted to old version for the 1.x update 
 
 > **11-06-2019**
 > - Reverted to older version because of Bug. 
