@@ -209,10 +209,17 @@ function Get-NuGetPackageMetadata([string]$filePath) {
     try {
         $nuspecEntry = $zip.Entries | Where-Object { $_.FullName -like '*.nuspec' } | Select-Object -First 1
         [System.IO.Compression.ZipFileExtensions]::ExtractToFile($nuspecEntry, $tempFilePath, $true)
-        $ns = @{ msxml = "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd" }
-        $metadata = Select-Xml -Path $tempFilePath -Namespace $ns -XPath "//msxml:metadata" | Select-Object -ExpandProperty Node | Select-Object -ExpandProperty ChildNodes
-        $package.Name = ($metadata | Where-Object {$_.Name -eq 'id' } | Select-Object -First 1).InnerText
-        $package.Version = ($metadata | Where-Object {$_.Name -eq 'version' } | Select-Object -First 1).InnerText
+        $ns = @{    
+            nuspec201305 = "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"; 
+            nuspec201206 = "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd"; 
+        }
+        foreach ($key in $ns.Keys) {
+            $metadata = Select-Xml -Path $tempFilePath -Namespace $ns -XPath "//$($key):metadata"
+            if ($metadata) { break }
+        }
+        $packageMetadata = $metadata | Select-Object -ExpandProperty Node | Select-Object -ExpandProperty ChildNodes
+        $package.Name = ($packageMetadata | Where-Object {$_.Name -eq 'id' } | Select-Object -First 1).InnerText
+        $package.Version = ($packageMetadata | Where-Object {$_.Name -eq 'version' } | Select-Object -First 1).InnerText
     } finally {
         Remove-Item $tempFilePath -Force -ErrorAction SilentlyContinue
         $zip.Dispose()
