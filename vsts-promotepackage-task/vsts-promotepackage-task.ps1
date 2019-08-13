@@ -205,14 +205,13 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 function Get-NuGetPackageMetadata([string]$filePath) {
     $package = New-PackageObject
     $zip = [System.IO.Compression.ZipFile]::OpenRead($filePath)
-    $tempFilePath = (New-TemporaryFile).FullName
     try {
+        $tempFilePath = (New-TemporaryFile).FullName
         $nuspecEntry = $zip.Entries | Where-Object { $_.FullName -like '*.nuspec' } | Select-Object -First 1
         [System.IO.Compression.ZipFileExtensions]::ExtractToFile($nuspecEntry, $tempFilePath, $true)
-        $ns = @{ msxml = "http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd" }
-        $metadata = Select-Xml -Path $tempFilePath -Namespace $ns -XPath "//msxml:metadata" | Select-Object -ExpandProperty Node | Select-Object -ExpandProperty ChildNodes
-        $package.Name = ($metadata | Where-Object {$_.Name -eq 'id' } | Select-Object -First 1).InnerText
-        $package.Version = ($metadata | Where-Object {$_.Name -eq 'version' } | Select-Object -First 1).InnerText
+        $xml = [xml](Get-Content $tempFilePath)
+        $package.Name = ([string]$xml.package.metadata.id).Trim()
+        $package.Version = ([string]$xml.package.metadata.version).Trim()
     } finally {
         Remove-Item $tempFilePath -Force -ErrorAction SilentlyContinue
         $zip.Dispose()
