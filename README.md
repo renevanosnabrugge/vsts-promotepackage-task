@@ -2,6 +2,10 @@
 
 [![Build status](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_apis/build/status/vsts-promotepackage-task/vsts-promotepackage-task)](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_build/latest?definitionId=118)
 
+>>**8-13-2019**
+> -Removed dependency on .nuspec XML namespace described in detail in this [Pull Request](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/30)
+> - All credits go to [Shad Storhaug](https://github.com/NightOwl888) for all his hard work on this
+
 >>**7-19-2019**
 > - Major update for Promotion of multiple packages in one go (by specifying the package ids separated by semicolons) described in detail in this [Pull Request](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/25)
 > - All credits go to [Shad Storhaug](https://github.com/NightOwl888) for all his hard work on this
