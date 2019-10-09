@@ -137,14 +137,15 @@ function Set-PackageQuality([PSObject]$requestContext, [string]$feedName, [strin
     $packageInfo = Get-PackageInfo -RequestContext $requestContext -FeedId $feedId -PackageId $packageId
     $packageName = $packageInfo.Name
     $feedType = $packageInfo.FeedType
+	$encodedPackageVersion = [System.Web.HttpUtility]::UrlEncode($packageVersion)
 
     #API URL is slightly different for npm vs. nuget...
     switch($feedType) {
-        "npm"    { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
-        "nuget"  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
-        "upack"  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
-        "pypi"   { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
-        default  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($packageVersion)?api-version=5.0-preview.1" }
+        "npm"    { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/$packageName/versions/$($encodedPackageVersion)?api-version=5.0-preview.1" }
+        "nuget"  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($encodedPackageVersion)?api-version=5.0-preview.1" }
+        "upack"  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($encodedPackageVersion)?api-version=5.0-preview.1" }
+        "pypi"   { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($encodedPackageVersion)?api-version=5.0-preview.1" }
+        default  { $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($encodedPackageVersion)?api-version=5.0-preview.1" }
     }
 
     $json = @{
