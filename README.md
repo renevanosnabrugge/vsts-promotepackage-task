@@ -2,6 +2,11 @@
 
 [![Build status](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_apis/build/status/vsts-promotepackage-task/vsts-promotepackage-task)](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_build/latest?definitionId=118)
 
+>>**10-16-2019**
+> -Fix encoding issue in feed url with possible prerelease package versions (for example 1.1.0+2). When promoting packages with the "+" character, a 404 error occurred (not found). [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/34)
+
+> - All credits go to [Pieter Gheysens](https://github.com/pietergheysens) 
+
 >>**8-13-2019**
 > -Removed dependency on .nuspec XML namespace described in detail in this [Pull Request](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/30)
 > - All credits go to [Shad Storhaug](https://github.com/NightOwl888) for all his hard work on this
