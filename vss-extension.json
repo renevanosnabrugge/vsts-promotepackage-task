@@ -14,7 +14,7 @@
   ],
   "description": "This task promotes a package to a Release View in Azure DevOps Artifacts",
   "categories": [
-    "Azure Pipelines"
+    "Build and release"
   ],
   "tags": [
     "Extension",
