@@ -7,6 +7,10 @@
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services.Cloud"
+    },
+    {
+      "id": "Microsoft.TeamFoundation.Server",
+      "version": "[17.0,)"
     }
   ],
   "scope": [
