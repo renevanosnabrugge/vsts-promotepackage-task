@@ -27,6 +27,7 @@ function InitializeRestHeaders() {
 }
 
 function GetAccessToken($vssEndPoint) {
+    Write-Verbose -Verbose "Getting Access Token..."
     $endpoint = (Get-VstsEndpoint -Name SystemVssConnection -Require)
     $vssCredential = [string]$endpoint.auth.parameters.AccessToken
     return $vssCredential
@@ -36,6 +37,7 @@ function ValidatePatToken($token) {
     if([string]::IsNullOrWhiteSpace($token)) {
         throw "Unable to generate Personal Access Token for the user. Contact Project Collection Administrator"
     }
+	Write-Verbose -Verbose 'Validated Pat Token.'
 }
 
 function Get-FeedId([PSObject]$requestContext, [string]$feedName) {
@@ -176,8 +178,9 @@ function Initalize-RequestContext() {
         $account = $hostName.Split('.')[0] # First subdomain of hostname
         $basepackageurl = "https://$($account).pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds"
         $basefeedsurl = "https://$($account).feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds"
-    } else {
-        Write-Host "On-Premise TFS / Azure DevOps Server not supported"
+    } else {		
+        $basepackageurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "/_apis/packaging/feeds"
+        $basefeedsurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "/_apis/packaging/feeds"
     }
 
     $headers = InitializeRestHeaders
