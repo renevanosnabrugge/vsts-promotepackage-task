@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
   "id": "7ca5869f-a901-4012-a50d-d0f9d436ffec",
   "name": "rvo-vsts-promotepackage-task",
   "friendlyName": "#{PrivatePublicExtension}#Promote package to Release View",
@@ -23,7 +24,7 @@
       "label": "Use packages from this VSTS feed",
       "defaultValue": "",
       "helpMarkDown": "Include the selected feed in the generated NuGet.config.",
-      "required": "true",
+      "required": true,
       "properties": {
         "EditableOptions": "true"
       }
@@ -34,7 +35,7 @@
       "label": "Package input type",
       "defaultValue": "nameVersion",
       "helpMarkDown": "Preferred input type. Either specify the name(s) and version explicitly, or retrieve name(s) and version(s) from metadata of package file(s).",
-      "required": "true",
+      "required": true,
       "options": {
         "nameVersion": "Specify name and version",
         "packageFiles": "Get name(s) and version(s) from metadata of package file(s)"
@@ -49,7 +50,7 @@
       "label": "Package",
       "defaultValue": "",
       "helpMarkDown": "Select the package that you want to promote. Multiple packages may be supplied separated with a comma or semicolon. Note you may use either the name of the package or its GUID.",
-      "required": "true",
+      "required": true,
       "properties": {
         "EditableOptions": "true",
         "MultiSelectFlatList": "True"
@@ -62,7 +63,7 @@
       "label": "Package Version",
       "defaultValue": "",
       "helpMarkDown": "Enter the version you want to promote or a [variable](https://go.microsoft.com/fwlink/?LinkID=550988).",
-      "required": "true",
+      "required": true,
       "visibleRule": "inputType = nameVersion"
     },
     {
@@ -71,7 +72,7 @@
       "label": "Package source folder",
       "defaultValue": "$(System.DefaultWorkingDirectory)",
       "helpMarkDown": "The source folder that the package file pattern(s) will be searched in.",
-      "required": "true",
+      "required": true,
       "visibleRule": "inputType = packageFiles"
     },
     {
@@ -80,7 +81,7 @@
       "label": "Package file paths",
       "defaultValue": "**/*.nupkg\n!**/*.symbols.nupkg\n**/*.tgz",
       "helpMarkDown": "The file paths or glob pattern to match nupkg/tgz files within the package source folder containing the package name and versions (as metadata) that will be promoted. Multiple patterns can be separated by a semicolon or be placed on separate lines.",
-      "required": "true",
+      "required": true,
       "properties": {
         "resizable": "true",
         "rows": "10",
@@ -94,7 +95,7 @@
       "label": "Release Views",
       "defaultValue": "",
       "helpMarkDown": "Select the view to which to promote the package.",
-      "required": "true",
+      "required": true,
       "properties": {
         "EditableOptions": "true"
       }
@@ -106,8 +107,8 @@
       "endpointId": "tfs:feed",
       "endpointUrl": "{{endpoint.url}}/_apis/packaging/feeds",
       "resultSelector": "jsonpath:$.value[*]",
-      "resultTemplate": "{ \"Value\" : \"{{{id}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
-    },
+      "resultTemplate": "{ \"Value\" : \"{{#if project}}{{{project.name}}}\\/{{/if}}{{{name}}}\", \"DisplayValue\" : \"{{{name}}}\" }"
+      },
     {
       "target": "packageIds",
       "endpointId": "tfs:feed",
