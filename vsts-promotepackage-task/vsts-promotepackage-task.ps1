@@ -162,7 +162,7 @@ function Set-PackageQuality([PSObject]$requestContext, [string]$feedName, [strin
     return $response
 }
 
-function Initalize-RequestContext() {
+function Initalize-RequestContext([string]$projectId) {
     $basepackageurl = ""
     $basefeedsurl = ""
     $uri = [uri]$env:SYSTEM_TEAMFOUNDATIONSERVERURI
@@ -171,13 +171,23 @@ function Initalize-RequestContext() {
     if (($hostName -eq "dev.azure.com") -or ($hostName -eq "vsrm.dev.azure.com")) {
         #new style
         $account = $uri.Segments[1].TrimEnd('/') # First segment after hostname
-        $basepackageurl = "https://pkgs.dev.azure.com/$($account)/_apis/packaging/feeds"
-        $basefeedsurl = "https://feeds.dev.azure.com/$($account)/_apis/packaging/feeds"
+        if ([string]::IsNullOrEmpty($projectId)) {
+            $basepackageurl = "https://pkgs.dev.azure.com/$($account)/_apis/packaging/feeds"
+            $basefeedsurl = "https://feeds.dev.azure.com/$($account)/_apis/packaging/feeds"
+        } else {
+            $basepackageurl = "https://pkgs.dev.azure.com/$($account)/$($projectId)/_apis/packaging/feeds"
+            $basefeedsurl = "https://feeds.dev.azure.com/$($account)/$($projectId)/_apis/packaging/feeds"
+        }
     } elseif ($hostName.EndsWith("visualstudio.com")) {
         #old style
         $account = $hostName.Split('.')[0] # First subdomain of hostname
-        $basepackageurl = "https://$($account).pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds"
-        $basefeedsurl = "https://$($account).feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds"
+        if ([string]::IsNullOrEmpty($projectId)) {
+            $basepackageurl = "https://$($account).pkgs.visualstudio.com/DefaultCollection/_apis/packaging/feeds"
+            $basefeedsurl = "https://$($account).feeds.visualstudio.com/DefaultCollection/_apis/packaging/feeds"
+        } else {
+            $basepackageurl = "https://$($account).pkgs.visualstudio.com/DefaultCollection/$($projectId)/_apis/packaging/feeds"
+            $basefeedsurl = "https://$($account).feeds.visualstudio.com/DefaultCollection/$($projectId)/_apis/packaging/feeds"
+        }
     } else {		
         $basepackageurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "/_apis/packaging/feeds"
         $basefeedsurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "/_apis/packaging/feeds"
@@ -255,7 +265,14 @@ function Run() {
     $feedName = Get-VstsInput -Name feed -Require
     $inputType = Get-VstsInput -Name inputType -Require
     $releaseView = Get-VstsInput -Name releaseView -Require
-    $requestContext = Initalize-RequestContext
+    $projectId = ""
+
+    # Determine if the package feed is scoped to a project.
+    if ($feedName.Contains('/')) {
+        $projectId,$feedName = $feedName.Split('/');
+    }
+
+    $requestContext = Initalize-RequestContext -ProjectId $projectId
 
     if ($inputType -eq "nameVersion") {
         $packageIds = Get-VstsInput -Name packageIds -Require
