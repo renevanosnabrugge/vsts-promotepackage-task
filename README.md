@@ -2,6 +2,11 @@
 
 [![Build status](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_apis/build/status/vsts-promotepackage-task/vsts-promotepackage-task)](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_build/latest?definitionId=118)
 
+>>**01-20-2020**
+> -Support for project scoped package feeds[Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/42)
+
+
+> - All credits go to [amrock-my](https://github.com/amrock-my) for contributing and [jzserai](https://github.com/jzserai) for testing
 
 >>**01-03-2020**
 > -Add --force-local to tar flags on Windows (issue #33 with npm packages [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/41)
