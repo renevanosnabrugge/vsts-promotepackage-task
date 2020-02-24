@@ -150,8 +150,8 @@ function Set-PackageQuality([PSObject]$requestContext, [string]$feedName, [strin
         "maven"   {
             $packageNameSplit=$packageName -split ":"
             if($packageNameSplit.Length -eq 2) {
-                $groupName = packageNameSplit[0]
-                $artifactName = packageNameSplit[1]
+                $groupName = $packageNameSplit[0]
+                $artifactName = $packageNameSplit[1]
                 $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/groups/$groupName/artifacts/$artifactName/versions/$($encodedPackageVersion)?api-version=5.0-preview.1"
             } else {
                 $releaseViewURL = "$($requestContext.BasePackageUrl)/$feedId/$feedType/packages/$packageName/versions/$($encodedPackageVersion)?api-version=5.0-preview.1"
