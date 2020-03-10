@@ -235,7 +235,7 @@ function Get-NuGetPackageMetadata([string]$filePath) {
 
 function Get-NpmPackageMetadata([string]$filePath) {
     $package = New-PackageObject
-    $tempDir = New-TemporaryDirectory    
+    $tempDir = New-TemporaryDirectory
     try {
         $flags = if ($IsWindows -or $Env:OS.StartsWith('Windows')) { '--force-local -xvzf' } else { 'xvzf' }
         tar $flags `"$filePath`" -C `"$tempDir`" 2> $null
