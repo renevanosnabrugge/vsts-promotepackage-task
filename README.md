@@ -2,6 +2,10 @@
 
 [![Build status](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_apis/build/status/vsts-promotepackage-task/vsts-promotepackage-task)](https://osnabrugge.visualstudio.com/RVO-VSTSExtensions/_build/latest?definitionId=118)
 
+>>**05-12-2020**
+> - Fixed UI for project scoped feeds [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/54)
+> - All credits go to [jessehouwing](https://github.com/sponsors/jessehouwing).
+
 >>**01-20-2020**
 > -Support for project scoped package feeds[Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/42)
 
