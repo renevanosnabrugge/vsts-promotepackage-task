@@ -279,11 +279,24 @@ function Run() {
         $packageIds = Get-VstsInput -Name packageIds -Require
         $packageVersion = Get-VstsInput -Name version -Require
 
-        $ids = $packageIds -Split ',\s*|;\s*'
+        # $ids = $packageIds -Split ',\s*|;\s*'
         Write-Host "Promoting $($ids.Length) package(s) named '$packageIds' with version '$packageVersion'"
-        foreach ($id in $ids) {
-            Set-PackageQuality -RequestContext $requestContext -FeedName $feedName -PackageId $id -PackageVersion $packageVersion -ReleaseView $releaseView
-        }
+		If($packageIds.Length -match $packageVersion.Length) {
+			For($i=0;$i -lt $packageIds.Length; $i++) {
+					"$($packageIds[$i]) :: $($packageVersion[$i])"
+					echo "Set-PackageQuality -RequestContext $requestContext -FeedName $feedName -PackageId $id -PackageVersion $packageVersion -ReleaseView $releaseView"
+					# Calling Set-PackageQuality function 
+					Set-PackageQuality -RequestContext $requestContext -FeedName $feedName -PackageId $id -PackageVersion $packageVersion -ReleaseView $releaseView
+					
+			}
+		} else {
+		   echo "Parametrs length not equal"
+		   exit			
+		}
+
+        # foreach ($id in $ids) {
+            # Set-PackageQuality -RequestContext $requestContext -FeedName $feedName -PackageId $id -PackageVersion $packageVersion -ReleaseView $releaseView
+        # }
     } else { # ($inputType -eq "packageFiles")
         $packagesDirectory = Get-VstsInput -Name packagesDirectory -Require
         $packagesPattern = Get-VstsInput -Name packagesPattern -Require
