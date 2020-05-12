@@ -7,24 +7,24 @@
 > - All credits go to [jessehouwing](https://github.com/sponsors/jessehouwing).
 
 >>**01-20-2020**
-> -Support for project scoped package feeds[Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/42)
+> - Support for project scoped package feeds[Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/42)
 
 
 > - All credits go to [amrock-my](https://github.com/amrock-my) for contributing and [jzserai](https://github.com/jzserai) for testing
 
 >>**01-03-2020**
-> -Add --force-local to tar flags on Windows (issue #33 with npm packages [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/41)
-> -Azure Devops Server (On-Premise) Support [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/37) 
+> - Add --force-local to tar flags on Windows (issue #33 with npm packages [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/41)
+> - Azure Devops Server (On-Premise) Support [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/37) 
 
 > - All credits go to [KocamanFaruk](https://github.com/KocamanFaruk) and [richieto](https://github.com/richieto)
 
 >>**10-16-2019**
-> -Fix encoding issue in feed url with possible prerelease package versions (for example 1.1.0+2). When promoting packages with the "+" character, a 404 error occurred (not found). [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/34)
+> - Fix encoding issue in feed url with possible prerelease package versions (for example 1.1.0+2). When promoting packages with the "+" character, a 404 error occurred (not found). [Click for details](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/34)
 
 > - All credits go to [Pieter Gheysens](https://github.com/pietergheysens) 
 
 >>**8-13-2019**
-> -Removed dependency on .nuspec XML namespace described in detail in this [Pull Request](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/30)
+> - Removed dependency on .nuspec XML namespace described in detail in this [Pull Request](https://github.com/renevanosnabrugge/vsts-promotepackage-task/pull/30)
 > - All credits go to [Shad Storhaug](https://github.com/NightOwl888) for all his hard work on this
 
 >>**7-19-2019**
