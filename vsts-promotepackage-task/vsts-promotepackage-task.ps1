@@ -101,8 +101,9 @@ function Get-PackageInfo([PSObject]$requestContext, [string]$FeedId, [string]$pa
     if ($isId -eq $false) {
         try {
             Write-Verbose -Verbose "Package with id $packageId not found, searching with name"
-            $packagesUrl = "$($requestContext.BaseFeedUrl)/$FeedId/packages?api-version=5.0-preview.1"
-            Write-Verbose -Verbose "Retrieving all packages of requested feed: $packagesUrl"
+            # Feed retures top 1000, needs to use top&skip until no more results are returned. Quick workaround, pass packageNameQuery to limit results.
+            $packagesUrl = "$($requestContext.BaseFeedUrl)/$FeedId/packages?api-version=5.0-preview.1&packageNameQuery=$packageId"
+            Write-Verbose -Verbose "Retrieving all packages of requested feed: $packagesUrl matching packageName: $packageId"
             $packagesResponse = Invoke-RestMethod -Uri $packagesUrl -Headers $requestContext.Headers -ContentType "application/json" -Method Get
             $packages = $packagesResponse.value
             foreach ($package in $packages) {
