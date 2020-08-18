@@ -60,7 +60,6 @@
 
 # Description
 
-**BEWARE: This task does not work for on-prem TFS / Azure DevOps Server**
 This task enables you to promote a package in VSTS Package Management to a specific Release View. You can use Release Views to communicate Package Quality as [described here](https://www.visualstudio.com/en-us/docs/package/feeds/views). 
 In this task, you select the package feed from your account, the package, the version and the Release View to which you want to promote your package. 
 
