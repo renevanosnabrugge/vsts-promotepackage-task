@@ -189,9 +189,14 @@ function Initalize-RequestContext([string]$projectId) {
             $basepackageurl = "https://$($account).pkgs.visualstudio.com/DefaultCollection/$($projectId)/_apis/packaging/feeds"
             $basefeedsurl = "https://$($account).feeds.visualstudio.com/DefaultCollection/$($projectId)/_apis/packaging/feeds"
         }
-    } else {		
-        $basepackageurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "/_apis/packaging/feeds"
-        $basefeedsurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "/_apis/packaging/feeds"
+    } else {	
+        if ([string]::IsNullOrEmpty($projectId)) {	
+            $basepackageurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "_apis/packaging/feeds"
+            $basefeedsurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "_apis/packaging/feeds"
+        } else {
+            $basepackageurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "($projectId)/_apis/packaging/feeds"
+            $basefeedsurl = $env:SYSTEM_TEAMFOUNDATIONSERVERURI + "($projectId)/_apis/packaging/feeds"
+        }
     }
 
     $headers = InitializeRestHeaders
