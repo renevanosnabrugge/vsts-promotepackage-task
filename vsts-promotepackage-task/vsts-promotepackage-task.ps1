@@ -216,12 +216,34 @@ function New-PackageObject {
     return $package
 }
 
+function Test-CommandExists
+{
+    param ($command)
+    $oldPreference = $ErrorActionPreference
+    $ErrorActionPreference = ‘stop’
+
+    try {
+        if ( Get-Command $command ){ return $true }
+    }
+    catch {}
+    finally { 
+        $ErrorActionPreference=$oldPreference 
+    }
+
+    return $false
+}
+
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 function Get-NuGetPackageMetadata([string]$filePath) {
     $package = New-PackageObject
     $zip = [System.IO.Compression.ZipFile]::OpenRead($filePath)
     try {
-        $tempFilePath = (New-TemporaryFile).FullName
+        # New-TemporaryFile doesn't exist in PS4
+        if (Test-CommandExists "New-TemporaryFile") {
+            $tempFilePath = (New-TemporaryFile).FullName
+        } else {
+            $tempFilePath = [System.IO.Path]::GetTempFileName()
+        }
         $nuspecEntry = $zip.Entries | Where-Object { $_.FullName -like '*.nuspec' } | Select-Object -First 1
         [System.IO.Compression.ZipFileExtensions]::ExtractToFile($nuspecEntry, $tempFilePath, $true)
         $xml = [xml](Get-Content $tempFilePath)
