@@ -239,10 +239,7 @@ function Get-NpmPackageMetadata([string]$filePath) {
     $package = New-PackageObject
     $tempDir = New-TemporaryDirectory
     try {
-        if ($IsWindows -eq $null) {
-            $IsWindows = $Env:OS.StartsWith('Windows')
-        }
-        $flags = if ($IsWindows) { '--force-local -xvzf' } else { 'xvzf' }
+        $flags = if ($IsWindows -or $Env:OS.StartsWith('Windows')) { '--force-local -xvzf' } else { 'xvzf' }
         tar $flags `"$filePath`" -C `"$tempDir`" 2> $null
         $packageJsonPath = "$tempDir/package/package.json"
         $packageJson = Get-Content -Raw -Path $packageJsonPath | ConvertFrom-Json
