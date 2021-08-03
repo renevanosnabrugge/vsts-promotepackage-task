@@ -226,7 +226,8 @@ function Get-NuGetPackageMetadata([string]$filePath) {
     $package = New-PackageObject
     $zip = [System.IO.Compression.ZipFile]::OpenRead($filePath)
     try {
-        $tempFilePath = (New-TemporaryFile).FullName
+        # New-TemporaryFile doesn't exist in PS4
+        $tempFilePath = [System.IO.Path]::GetTempFileName()
         $nuspecEntry = $zip.Entries | Where-Object { $_.FullName -like '*.nuspec' } | Select-Object -First 1
         [System.IO.Compression.ZipFileExtensions]::ExtractToFile($nuspecEntry, $tempFilePath, $true)
         $xml = [xml](Get-Content $tempFilePath)
